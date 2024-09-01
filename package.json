@@ -5,11 +5,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "micromark",
+    "micromark-extension",
+    "abbr",
+    "markdown",
+    "unified"
+  ],
+  "exports": {
+    "default": "./dev/index.js"
+  },
+  "author": "Richard Towers",
   "license": "MIT",
   "private": true,
-  "description": "",
+  "description": "micromark extension to support abbreviations",
   "type": "module",
   "devDependencies": {
     "micromark": "^4.0.0"
