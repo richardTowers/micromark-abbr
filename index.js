@@ -58,6 +58,25 @@ function variableTokenize(effects, ok, nok) {
   return start
 }
 
+export function variablesHtml(data = {}) {
+  function enterVariableString() {
+    this.buffer()
+  }
+  
+  function exitVariableString() {
+    var id = this.resume()
+    console.log(id, data, id in data, data.hasOwnProperty(id))
+    if (data.hasOwnProperty(id)) {
+      this.raw(this.encode(data[id]))
+    }
+  }
+  
+  return {
+    enter: { variableString: enterVariableString },
+    exit: { variableString: exitVariableString },
+  }
+}
+
 export const variables = {
   text: {
     [charCodes.LEFT_CURLY_BRACE]: {
