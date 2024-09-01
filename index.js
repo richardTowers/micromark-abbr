@@ -1,11 +1,4 @@
-const charCodes = {
-  CR: -5,
-  LF: -4,
-  CRLF: -3,
-  BACKSLASH: '\\'.charCodeAt(0),
-  LEFT_CURLY_BRACE: '{'.charCodeAt(0),
-  RIGHT_CURLY_BRACE: '}'.charCodeAt(0)
-}
+import { codes, types } from "micromark-util-symbol"
 
 function variableTokenize(effects, ok, nok) {
   function start(code) {
@@ -14,26 +7,26 @@ function variableTokenize(effects, ok, nok) {
     effects.consume(code)
     effects.exit('variableMarker')
     effects.enter('variableString')
-    effects.enter('chunkString', { contentType: 'string' })
+    effects.enter(types.chunkString, { contentType: 'string' })
     return begin
   }
   
   function begin(code) {
-    return code == charCodes.RIGHT_CURLY_BRACE ? nok(code) : inside(code)
+    return code == codes.rightCurlyBrace ? nok(code) : inside(code)
   }
 
   function inside(code) {
-    if ([charCodes.CR, charCodes.LF, charCodes.CRLF, null].includes(code)) {
+    if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul].includes(code)) {
       return nok(code)
     }
     
-    if (code === charCodes.BACKSLASH) {
+    if (code === codes.backslash) {
       effects.consume(code)
       return insideEscape
     }
     
-    if (code === charCodes.RIGHT_CURLY_BRACE) {
-      effects.exit('chunkString')
+    if (code === codes.rightCurlyBrace) {
+      effects.exit(types.chunkString)
       effects.exit('variableString')
       effects.enter('variableMarker')
       effects.consume(code)
@@ -47,7 +40,7 @@ function variableTokenize(effects, ok, nok) {
   }
 
   function insideEscape(code) {
-    if ([charCodes.BACKSLASH, charCodes.RIGHT_CURLY_BRACE].includes(code)) {
+    if ([codes.backslash, codes.rightCurlyBrace].includes(code)) {
       effects.consume(code)
       return inside
     }
@@ -79,7 +72,7 @@ export function variablesHtml(data = {}) {
 
 export const variables = {
   text: {
-    [charCodes.LEFT_CURLY_BRACE]: {
+    [codes.leftCurlyBrace]: {
       name: 'variable',
       tokenize: variableTokenize
     }

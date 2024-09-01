@@ -13,5 +13,8 @@
   "type": "module",
   "devDependencies": {
     "micromark": "^4.0.0"
+  },
+  "dependencies": {
+    "micromark-util-symbol": "^2.0.0"
   }
 }
