@@ -1,5 +1,6 @@
 import { codes } from "micromark-util-symbol"
 import { factorySpace } from "micromark-factory-space"
+import { unicodePunctuation, unicodeWhitespace } from "micromark-util-character"
 
 function abbrDefinitionTokenize(effects, ok, nok) {
   const self = this
@@ -120,11 +121,10 @@ function abbrCallTokenize(effects, ok, nok) {
   // HTML
   // ^
   function start(code) {
-    const prev = self.events[self.events.length - 1]
-    // If the previous token is undefined (so we're at the start of a string)
-    // Or if the previous token didn't end with a word character
-    // then this could be an abbr
-    if (typeof prev === 'undefined' || /\W$/.test(self.sliceSerialize(prev[1]))) {
+    // If the previous token is null we're at the start of a string
+    // If the previous token was whitespace or punctuation
+    // Then this could be an abbr
+    if (self.previous === null || unicodeWhitespace(self.previous) || unicodePunctuation(self.previous)) {
       effects.enter('abbrCall')
       return match
     }
