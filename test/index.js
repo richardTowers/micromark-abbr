@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises'
-import {micromark, preprocess, parse, postprocess} from 'micromark'
+import {micromark} from 'micromark'
 
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import {abbr} from 'micromark-extension-abbr'
+import {abbr, abbrHtml} from 'micromark-extension-abbr'
 
 await test('micromark-extension-abbr', async () => {
   await test('fixtures', async function (t) {
@@ -23,7 +23,7 @@ await test('micromark-extension-abbr', async () => {
       await t.test(name, async function () {
         const input = await fs.readFile(new URL(name + '.md', base))
         const expected = String(await fs.readFile(new URL(name + '.html', base)))
-        let actual = micromark(input, {extensions: [abbr]})
+        let actual = micromark(input, {extensions: [abbr], htmlExtensions: [abbrHtml]})
 
         if (actual && !/\n$/.test(actual)) {
           actual += '\n'

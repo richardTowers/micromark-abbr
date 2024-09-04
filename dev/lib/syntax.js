@@ -1,6 +1,7 @@
 import { codes } from "micromark-util-symbol"
 import { factorySpace } from "micromark-factory-space"
 import { unicodePunctuation, unicodeWhitespace } from "micromark-util-character"
+import { definition } from "micromark-core-commonmark"
 
 function abbrDefinitionTokenize(effects, ok, nok) {
   const self = this
@@ -35,6 +36,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //   ^
   function abbrKeyStart(code) {
     effects.enter('abbrKey')
+    effects.enter('chunkString', { contentType: 'string' })
     return abbrKey
   }
 
@@ -48,6 +50,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
     if (code === codes.rightSquareBracket) {
       // TODO sanitize these identifiers
       // TODO - do this in exit('abbr') instead so we can get the key and value at the same time?
+      effects.exit('chunkString')
       const token = self.sliceSerialize(effects.exit('abbrKey'))
       if (!defined.find(pair => pair['key'] === token)) {
         defined.push({ key: token })
@@ -84,6 +87,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //          ^
   function abbrValueStart(code) {
     effects.enter('abbrValue')
+    effects.enter('chunkString', { contentType: 'string' })
     return abbrValue
   }
 
@@ -91,6 +95,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   function abbrValue(code) {
     if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul].includes(code)) {
+      effects.exit('chunkString')
       const token = self.sliceSerialize(effects.exit('abbrValue'))
       const lastDefined = defined[defined.length - 1]
       if (lastDefined && lastDefined['key'] && !lastDefined['value']) {
@@ -126,6 +131,7 @@ function abbrCallTokenize(effects, ok, nok) {
     // Then this could be an abbr
     if (self.previous === null || unicodeWhitespace(self.previous) || unicodePunctuation(self.previous)) {
       effects.enter('abbrCall')
+      effects.enter('chunkString', { contentType: 'string' })
       return match
     }
     else {
@@ -141,12 +147,14 @@ function abbrCallTokenize(effects, ok, nok) {
     if (newCandidateKeys.length > 0) {
       candidateKeys = newCandidateKeys
       pointer++
+      console.log('consuming', String.fromCharCode(code))
       effects.consume(code)
       return match
     }
 
     // Have we fully matched any of the keys?
     if (candidateKeys.some(k => k.length === pointer)) {
+      effects.exit('chunkString')
       effects.exit('abbrCall')
       return ok(code)
     }
