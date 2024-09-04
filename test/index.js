@@ -23,16 +23,13 @@ await test('micromark-extension-abbr', async () => {
       await t.test(name, async function () {
         const input = await fs.readFile(new URL(name + '.md', base))
         const expected = String(await fs.readFile(new URL(name + '.html', base)))
-        let actual = postprocess(parse({extensions: [abbr]}).document().write(preprocess()(input, null, true)))
+        let actual = micromark(input, {extensions: [abbr]})
 
-        // console.log(actual)
+        if (actual && !/\n$/.test(actual)) {
+          actual += '\n'
+        }
 
-
-        // if (actual && !/\n$/.test(actual)) {
-        //   actual += '\n'
-        // }
-
-        assert(true)
+        assert.equal(actual, expected)
       })
     }
   })
