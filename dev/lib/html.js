@@ -29,11 +29,13 @@ export const abbrHtml = {
     },
     abbrCall() {
       const abbr = this.resume()
-      console.log(`'${abbr}'`)
-      this.tag(`<abbr title="{{${abbr}}}">${abbr}</abbr>`)
-    },
-    null() {
-      console.log(this)
+      const definitions = this.getData('definitions')
+      if (definitions.hasOwnProperty(abbr)) {
+        this.tag(`<abbr title="${definitions[abbr]}">${abbr}</abbr>`)
+      }
+      else {
+        this.tag(`<abbr>${abbr}</abbr>`)
+      }
     }
   }
 }

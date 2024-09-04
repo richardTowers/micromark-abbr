@@ -1,7 +1,6 @@
-import { codes } from "micromark-util-symbol"
+import { codes, types } from "micromark-util-symbol"
 import { factorySpace } from "micromark-factory-space"
 import { unicodePunctuation, unicodeWhitespace } from "micromark-util-character"
-import { definition } from "micromark-core-commonmark"
 
 function abbrDefinitionTokenize(effects, ok, nok) {
   const self = this
@@ -13,6 +12,10 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // ^
   function start(code) {
     // TODO - assertions
+    // TODO - it feels hacky to be using the "definition" type here. We're doing so because definitions get hoisted
+    //        to the top of the events array, which means they can be referenced by events that may use the definitions in the HTML compiler.
+    //        Strictly speaking though, abbr definitions are not exactly the same as link reference definitions, and reusing them is probably going to cause confusion.
+    effects.enter(types.definition)
     effects.enter('abbr')
     effects.enter('abbrKeyDefinition')
     effects.consume(code)
@@ -35,6 +38,8 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // *[HTML]: Hyper Text Markup Language
   //   ^
   function abbrKeyStart(code) {
+    // definitions have to have a label, otherwise we get an error from the default definitions handlers
+    effects.enter(types.definitionLabelString)
     effects.enter('abbrKey')
     effects.enter('chunkString', { contentType: 'string' })
     return abbrKey
@@ -52,6 +57,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
       // TODO - do this in exit('abbr') instead so we can get the key and value at the same time?
       effects.exit('chunkString')
       const token = self.sliceSerialize(effects.exit('abbrKey'))
+      effects.exit(types.definitionLabelString)
       if (!defined.find(pair => pair['key'] === token)) {
         defined.push({ key: token })
       }
@@ -102,6 +108,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
         lastDefined['value'] = token
       }
       effects.exit('abbr')
+      effects.exit(types.definition)
       return ok
     }
 
@@ -147,7 +154,6 @@ function abbrCallTokenize(effects, ok, nok) {
     if (newCandidateKeys.length > 0) {
       candidateKeys = newCandidateKeys
       pointer++
-      console.log('consuming', String.fromCharCode(code))
       effects.consume(code)
       return match
     }
