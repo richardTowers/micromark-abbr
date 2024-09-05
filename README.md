@@ -1,6 +1,6 @@
 # micromark-extension-abbr
 
-[micromark][] extensions to support [abbreviations in the style of PHP's Markdown Extra][php-markdown-extra]
+[micromark][] extensions to support abbreviations in the style of [PHP's Markdown Extra][php-markdown-extra] and [Kramdown][kramdown-abbreviations].
 
 **Status:** Work in progress / Not ready for publishing to npm
 
@@ -112,3 +112,5 @@ Best efforts
 [mdast-util-gfm-footnote]: https://github.com/syntax-tree/mdast-util-gfm-footnote
 
 [php-markdown-extra]: https://michelf.ca/projects/php-markdown/extra/#abbr
+
+[kramdown-abbreviations]: https://kramdown.gettalong.org/syntax.html#abbreviations
