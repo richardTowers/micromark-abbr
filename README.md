@@ -1,6 +1,6 @@
 # micromark-extension-abbr
 
-[micromark][] extensions to support [abbreviations in the style of PHP's Markdown Extra](https://michelf.ca/projects/php-markdown/extra/#abbr)
+[micromark][] extensions to support [abbreviations in the style of PHP's Markdown Extra][php-markdown-extra]
 
 **Status:** Work in progress / Not ready for publishing to npm
 
@@ -13,14 +13,9 @@
 * [API](#api)
 * [Bugs](#bugs)
 * [Authoring](#authoring)
-* [HTML](#html)
-* [CSS](#css)
-* [Syntax](#syntax)
 * [Types](#types)
 * [Compatibility](#compatibility)
-* [Security](#security)
 * [Related](#related)
-* [Contribute](#contribute)
 * [License](#license)
 
 ## What is this?
@@ -79,7 +74,7 @@ There is no default export.
 
 The export map supports the [`development` condition][development].
 Run `node --conditions development module.js` to get instrumented dev code.
-Without this condition, production code is loaded.
+Without this condition, production code is loaded. (TODO - eventually)
 
 ## Bugs
 
@@ -99,9 +94,21 @@ Best efforts
 
 ## Related
 
-* [`micromark-extension-gfm`][micromark-extension-gfm]
-  — support all of GFM
+* [`micromark-extension-gfm`][micromark-extension-gfm] — support all of GFM
+* [`mdast-util-gfm-footnote`][mdast-util-gfm-footnote] — converting GFM footnotes into markdown AST
 
 ## License
 
-MIT © Richard Towers
+[MIT][licence] © Richard Towers
+
+[licence]: LICENCE
+
+[development]: https://nodejs.org/api/packages.html#packages_resolving_user_conditions
+
+[micromark]: https://github.com/micromark/micromark
+
+[micromark-extension-gfm]: https://github.com/micromark/micromark-extension-gfm
+
+[mdast-util-gfm-footnote]: https://github.com/syntax-tree/mdast-util-gfm-footnote
+
+[php-markdown-extra]: https://michelf.ca/projects/php-markdown/extra/#abbr
