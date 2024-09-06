@@ -24,19 +24,28 @@ test('abbrFromMarkdown', async function (t) {
       children: [
         {
           type: 'abbrDefinition',
-          identifier: 'a',
-          label: 'a',
+          identifier: 'html',
+          label: 'HTML',
           children: [
+            {
+              // TODO parse this properly
+              type: 'text',
+              value: 'Hyper Text Markup Language',
+              position: {
+                start: { line: 1, column: 10, offset: 9 },
+                end: { line: 1, column: 36, offset: 35 },
+              }
+            }
           ],
           position: {
             start: { line: 1, column: 1, offset: 0 },
-            end: { line: 4, column: 6, offset: 16 }
+            end: { line: 1, column: 36, offset: 35 }
           }
         }
       ],
       position: {
         start: { line: 1, column: 1, offset: 0 },
-        end: { line: 4, column: 6, offset: 16 }
+        end: { line: 1, column: 36, offset: 35 }
       }
     }
     assert.deepEqual(actual, expected)
