@@ -1,7 +1,18 @@
+/**
+ * @import {
+ *   ConstructRecord,
+ *   Extension,
+ *   Tokenizer
+ * } from 'micromark-util-types'
+ */
 import { codes, types } from "micromark-util-symbol"
 import { factorySpace } from "micromark-factory-space"
 import { unicodePunctuation, unicodeWhitespace } from "micromark-util-character"
+import { resolveAll } from "micromark-util-resolve-all"
 
+/**
+ * @type {Tokenizer}
+ */
 function abbrDefinitionTokenize(effects, ok, nok) {
   const self = this
   const defined = self.parser.abbrDefinitions || (self.parser.abbrDefinitions = [])
@@ -117,6 +128,9 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   }
 }
 
+/**
+ * @type {Tokenizer}
+ */
 function abbrCallTokenize(effects, ok, nok) {
   const self = this
   const defined = self.parser.abbrDefinitions || (self.parser.abbrDefinitions = [])
@@ -170,6 +184,9 @@ function abbrCallTokenize(effects, ok, nok) {
   }
 }
 
+/**
+ * @type {ConstructRecord}
+ */
 const text = {}
 // TODO - consider support for abbreviations which don't start with uppercase ASCII letters
 for (let code = codes.uppercaseA; code <= codes.uppercaseZ; code++) {
@@ -179,14 +196,22 @@ for (let code = codes.uppercaseA; code <= codes.uppercaseZ; code++) {
   }
 }
 
+/**
+ * @type {ConstructRecord}
+ */
+const document = {
+  [codes.asterisk]: {
+    name: 'abbrDefinition',
+    tokenize: abbrDefinitionTokenize,
+    continuation: {},
+    exit: function () {}
+  }
+}
+
+/**
+ * @type {Extension}
+ */
 export const abbr = {
-  document: {
-    [codes.asterisk]: {
-      name: 'abbrDefinition',
-      tokenize: abbrDefinitionTokenize,
-      continuation: {},
-      exit: function () {}
-    }
-  },
+  document, // TODO - should this be contentInitial, like it is for definition?
   text
 }
