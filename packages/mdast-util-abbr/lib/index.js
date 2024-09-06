@@ -1,12 +1,9 @@
 /**
- * @typedef {import('mdast').FootnoteDefinition} FootnoteDefinition
- * @typedef {import('mdast').FootnoteReference} FootnoteReference
- * @typedef {import('mdast-util-from-markdown').CompileContext} CompileContext
- * @typedef {import('mdast-util-from-markdown').Extension} FromMarkdownExtension
- * @typedef {import('mdast-util-from-markdown').Handle} FromMarkdownHandle
- * @typedef {import('mdast-util-to-markdown').Handle} ToMarkdownHandle
- * @typedef {import('mdast-util-to-markdown').Map} Map
- * @typedef {import('mdast-util-to-markdown').Options} ToMarkdownExtension
+ * @import {
+ *   CompileContext,
+ *   Extension as FromMarkdownExtension,
+ *   Handle as FromMarkdownHandle
+ * } from 'mdast-util-from-markdown'
  */
 
 import { normalizeIdentifier } from "micromark-util-normalize-identifier"
