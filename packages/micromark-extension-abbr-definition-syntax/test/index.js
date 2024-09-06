@@ -11,8 +11,8 @@ await test('micromark-extension-abbr', async () => {
     const events = postprocess(
       parse({ extensions: [abbr] }).document().write(preprocess()(input, null, true))
     )
-    const entry = events.find(event => event[0] === 'enter' && event[1].type === 'abbr')
-    const exit  = events.find(event => event[0] === 'exit' && event[1].type === 'abbr')
+    const entry = events.find(event => event[0] === 'enter' && event[1].type === 'abbrDefinition')
+    const exit  = events.find(event => event[0] === 'exit' && event[1].type === 'abbrDefinition')
     assert(entry)
     assert(exit)
   })

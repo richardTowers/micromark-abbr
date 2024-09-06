@@ -5,7 +5,7 @@
  *   Tokenizer
  * } from 'micromark-util-types'
  */
-import { codes } from "micromark-util-symbol"
+import { codes, types } from "micromark-util-symbol"
 import { factorySpace } from "micromark-factory-space"
 
 /**
@@ -25,8 +25,8 @@ function abbrDefinitionTokenize(effects, ok, nok) {
     // TODO - it feels hacky to be using the "definition" type here. We're doing so because definitions get hoisted
     //        to the top of the events array, which means they can be referenced by events that may use the definitions in the HTML compiler.
     //        Strictly speaking though, abbr definitions are not exactly the same as link reference definitions, and reusing them is probably going to cause confusion.
-    effects.enter('abbr')
-    effects.enter('abbrKeyDefinition')
+    effects.enter('abbrDefinition')
+    effects.enter('abbrDefinitionLabel')
     effects.consume(code)
     return abbrKeyDefinition
   }
@@ -48,8 +48,8 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //   ^
   function abbrKeyStart(code) {
     // definitions have to have a label, otherwise we get an error from the default definitions handlers
-    effects.enter('abbrKey')
-    effects.enter('chunkString', { contentType: 'string' })
+    effects.enter('abbrDefinitionLabelString')
+    effects.enter(types.chunkString, { contentType: 'string' })
     return abbrKey
   }
 
@@ -62,14 +62,14 @@ function abbrDefinitionTokenize(effects, ok, nok) {
 
     if (code === codes.rightSquareBracket) {
       // TODO sanitize these identifiers
-      // TODO - do this in exit('abbr') instead so we can get the key and value at the same time?
+      // TODO - do this in exit('abbrDefinition') instead so we can get the key and value at the same time?
       effects.exit('chunkString')
-      const token = self.sliceSerialize(effects.exit('abbrKey'))
+      const token = self.sliceSerialize(effects.exit('abbrDefinitionLabelString'))
       if (!defined.find(pair => pair['key'] === token)) {
         defined.push({ key: token })
       }
       effects.consume(code)
-      effects.exit('abbrKeyDefinition')
+      effects.exit('abbrDefinitionLabel')
       return abbrKeyValueSeparator
     }
 
@@ -99,8 +99,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // *[HTML]: Hyper Text Markup Language
   //          ^
   function abbrValueStart(code) {
-    effects.enter('abbrValue')
-    effects.enter('chunkString', { contentType: 'string' })
+    effects.enter('abbrValue', { contentType: 'string' })
     return abbrValue
   }
 
@@ -109,13 +108,12 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   function abbrValue(code) {
     // TODO - do we need both codes.nul and null here?
     if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul, null].includes(code)) {
-      effects.exit('chunkString')
       const token = self.sliceSerialize(effects.exit('abbrValue'))
       const lastDefined = defined[defined.length - 1]
       if (lastDefined && lastDefined['key'] && !lastDefined['value']) {
         lastDefined['value'] = token
       }
-      effects.exit('abbr')
+      effects.exit('abbrDefinition')
       return ok
     }
 
