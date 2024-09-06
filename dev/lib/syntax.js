@@ -5,15 +5,14 @@
  *   Tokenizer
  * } from 'micromark-util-types'
  */
-import { codes, types } from "micromark-util-symbol"
+import { codes } from "micromark-util-symbol"
 import { factorySpace } from "micromark-factory-space"
-import { unicodePunctuation, unicodeWhitespace } from "micromark-util-character"
-import { resolveAll } from "micromark-util-resolve-all"
 
 /**
  * @type {Tokenizer}
  */
 function abbrDefinitionTokenize(effects, ok, nok) {
+  // TODO - make this a lot closer to the built it definition tokenizer
   const self = this
   const defined = self.parser.abbrDefinitions || (self.parser.abbrDefinitions = [])
 
@@ -26,7 +25,6 @@ function abbrDefinitionTokenize(effects, ok, nok) {
     // TODO - it feels hacky to be using the "definition" type here. We're doing so because definitions get hoisted
     //        to the top of the events array, which means they can be referenced by events that may use the definitions in the HTML compiler.
     //        Strictly speaking though, abbr definitions are not exactly the same as link reference definitions, and reusing them is probably going to cause confusion.
-    effects.enter(types.definition)
     effects.enter('abbr')
     effects.enter('abbrKeyDefinition')
     effects.consume(code)
@@ -50,7 +48,6 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //   ^
   function abbrKeyStart(code) {
     // definitions have to have a label, otherwise we get an error from the default definitions handlers
-    effects.enter(types.definitionLabelString)
     effects.enter('abbrKey')
     effects.enter('chunkString', { contentType: 'string' })
     return abbrKey
@@ -68,7 +65,6 @@ function abbrDefinitionTokenize(effects, ok, nok) {
       // TODO - do this in exit('abbr') instead so we can get the key and value at the same time?
       effects.exit('chunkString')
       const token = self.sliceSerialize(effects.exit('abbrKey'))
-      effects.exit(types.definitionLabelString)
       if (!defined.find(pair => pair['key'] === token)) {
         defined.push({ key: token })
       }
@@ -120,80 +116,11 @@ function abbrDefinitionTokenize(effects, ok, nok) {
         lastDefined['value'] = token
       }
       effects.exit('abbr')
-      effects.exit(types.definition)
       return ok
     }
 
     effects.consume(code)
     return abbrValue
-  }
-}
-
-/**
- * @type {Tokenizer}
- */
-function abbrCallTokenize(effects, ok, nok) {
-  const self = this
-  const defined = self.parser.abbrDefinitions || (self.parser.abbrDefinitions = [])
-  let pointer, candidateKeys
-  resetCandidates()
-
-  return start
-
-  function resetCandidates() {
-    pointer = 0
-    candidateKeys = defined.map(kv => kv['key'])
-  }
-
-  // HTML
-  // ^
-  function start(code) {
-    // If the previous token is null we're at the start of a string
-    // If the previous token was whitespace or punctuation
-    // Then this could be an abbr
-    if (self.previous === null || unicodeWhitespace(self.previous) || unicodePunctuation(self.previous)) {
-      effects.enter('abbrCall')
-      effects.enter('chunkString', { contentType: 'string' })
-      return match
-    }
-    else {
-      return nok(code)
-    }
-  }
-
-  function match(code) {
-    // TODO - operate on code points instead of strings
-    const char = String.fromCharCode(code)
-    const newCandidateKeys = candidateKeys.filter(k => k[pointer] === char)
-
-    if (newCandidateKeys.length > 0) {
-      candidateKeys = newCandidateKeys
-      pointer++
-      effects.consume(code)
-      return match
-    }
-
-    // Have we fully matched any of the keys?
-    if (candidateKeys.some(k => k.length === pointer)) {
-      effects.exit('chunkString')
-      effects.exit('abbrCall')
-      return ok(code)
-    }
-
-    resetCandidates()
-    return nok(code)
-  }
-}
-
-/**
- * @type {ConstructRecord}
- */
-const text = {}
-// TODO - consider support for abbreviations which don't start with uppercase ASCII letters
-for (let code = codes.uppercaseA; code <= codes.uppercaseZ; code++) {
-  text[code] = {
-    name: 'abbr',
-    tokenize: abbrCallTokenize
   }
 }
 
@@ -213,6 +140,5 @@ const contentInitial = {
  * @type {Extension}
  */
 export const abbr = {
-  contentInitial,
-  text
+  contentInitial
 }
