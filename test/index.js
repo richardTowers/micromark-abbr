@@ -3,7 +3,7 @@ import {preprocess, parse, postprocess, micromark} from 'micromark'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import {abbr} from 'micromark-extension-abbr'
+import {abbr} from 'micromark-extension-abbr-definition-syntax'
 
 await test('micromark-extension-abbr', async () => {
   await test('parses definitions', async () => {
