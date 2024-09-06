@@ -193,7 +193,13 @@ const text = {}
 for (let code = codes.uppercaseA; code <= codes.uppercaseZ; code++) {
   text[code] = {
     name: 'abbr',
-    tokenize: abbrCallTokenize
+    tokenize: abbrCallTokenize,
+    resolveAll: function (events) {
+      // It feels like there's a catch 22 here...
+      // if tokenize doesn't match anything, then resolveAll isn't called
+      // if we use the hack of starting tokenize on ASCII characters then resolveAll does get called, but at that point we don't need it because we've already tokenized what we need to...
+      console.log('text resolveAll', events.slice(0, 3))
+    }
   }
 }
 
@@ -205,7 +211,13 @@ const contentInitial = {
     name: 'abbrDefinition',
     tokenize: abbrDefinitionTokenize,
     continuation: {},
-    exit: function () {}
+    exit: function () {},
+    resolveAll: function (events) {
+      // Because we're in contentInitial here, we've only got the contentInitial events...
+      // Really we need a resolveAll to happen at the end of the text phase, but I'm not sure how
+      // to do that, since if we're not parsing abbr calls inside text, then we're not doing anything in text and resolveAll won't be called...
+      console.log('contentInitial resolveAll', events.slice(0, 3))
+    }
   }
 }
 
