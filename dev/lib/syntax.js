@@ -111,7 +111,8 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // *[HTML]: Hyper Text Markup Language
   //          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   function abbrValue(code) {
-    if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul].includes(code)) {
+    // TODO - do we need both codes.nul and null here?
+    if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul, null].includes(code)) {
       effects.exit('chunkString')
       const token = self.sliceSerialize(effects.exit('abbrValue'))
       const lastDefined = defined[defined.length - 1]
@@ -199,7 +200,7 @@ for (let code = codes.uppercaseA; code <= codes.uppercaseZ; code++) {
 /**
  * @type {ConstructRecord}
  */
-const document = {
+const contentInitial = {
   [codes.asterisk]: {
     name: 'abbrDefinition',
     tokenize: abbrDefinitionTokenize,
@@ -212,6 +213,6 @@ const document = {
  * @type {Extension}
  */
 export const abbr = {
-  document, // TODO - should this be contentInitial, like it is for definition?
+  contentInitial,
   text
 }
