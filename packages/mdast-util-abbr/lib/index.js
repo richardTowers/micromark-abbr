@@ -69,18 +69,17 @@ function splitTextByAbbr(textNode, abbreviations) {
         offset: position.start.offset + abbrEnd,
       }
     }
-    const title = definition.children[0].value
     nodes.push({
       type: 'abbr',
       abbr,
-      reference: title,
+      reference: definition.title,
       children: [
         { type: 'text', value: abbr, position: abbrPosition }
       ],
       data: {
         hName: 'abbr',
         hProperties: {
-          title: title,
+          title: definition.title,
         },
       },
       position: abbrPosition
@@ -125,10 +124,12 @@ export function abbrFromMarkdown() {
     enter: {
       abbrDefinition: enterAbbrDefinition,
       abbrDefinitionLabelString: enterAbbrDefinitionLabelString,
+      abbrDefinitionValueString: enterAbbrDefinitionValueString,
     },
     exit: {
       abbrDefinition: exitAbbrDefinition,
       abbrDefinitionLabelString: exitAbbrDefinitionLabelString,
+      abbrDefinitionValueString: exitAbbrDefinitionValueString,
     },
     transforms: [
       (tree) => {
@@ -183,6 +184,24 @@ export function abbrFromMarkdown() {
     node.identifier = normalizeIdentifier(
       this.sliceSerialize(token)
     ).toLowerCase()
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function enterAbbrDefinitionValueString() {
+    this.buffer()
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitAbbrDefinitionValueString(token) {
+    const node = this.stack.find(node => node.type === 'abbrDefinition')
+    // TODO assert(node is found)
+    node.title = this.resume()
   }
 
   /**

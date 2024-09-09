@@ -1,8 +1,10 @@
+import fs from 'node:fs/promises'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {fromMarkdown} from 'mdast-util-from-markdown'
 import {abbr} from 'micromark-extension-abbr-definition-syntax'
 import {abbrFromMarkdown} from 'mdast-util-abbr'
+import { title } from 'node:process'
 
 test('core', async function (t) {
   await t.test('should expose the public api', async function () {
@@ -26,13 +28,8 @@ test('abbrFromMarkdown', async function (t) {
           type: 'abbrDefinition',
           identifier: 'html',
           label: 'HTML',
-          children: [
-            {
-              type: 'text',
-              value: 'Hyper Text Markup Language',
-              position: { start: { line: 1, column: 10, offset: 9 }, end: { line: 1, column: 36, offset: 35 }, }
-            }
-          ],
+          title: 'Hyper Text Markup Language',
+          children: [],
           position: { start: { line: 1, column: 1, offset: 0 }, end: { line: 1, column: 36, offset: 35 } }
         }
       ],
@@ -103,16 +100,8 @@ test('abbrFromMarkdown', async function (t) {
           type: 'abbrDefinition',
           identifier: 'html',
           label: 'HTML',
-          children: [
-            {
-              type: 'text',
-              value: 'Hyper Text Markup Language',
-              position: {
-                start: { line: 3, column: 10, offset: 48 },
-                end: { line: 3, column: 36, offset: 74 }
-              }
-            }
-          ],
+          title: 'Hyper Text Markup Language',
+          children: [],
           position: {
             start: { line: 3, column: 1, offset: 39 },
             end: { line: 3, column: 36, offset: 74 }

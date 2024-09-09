@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/mdast": "^4.0.4",
-    "@types/unist": "^3.0.3"
+    "@types/unist": "^3.0.3",
+    "remark-stringify": "^11.0.0"
   }
 }

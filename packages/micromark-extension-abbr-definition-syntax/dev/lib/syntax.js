@@ -22,9 +22,6 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // ^
   function start(code) {
     // TODO - assertions
-    // TODO - it feels hacky to be using the "definition" type here. We're doing so because definitions get hoisted
-    //        to the top of the events array, which means they can be referenced by events that may use the definitions in the HTML compiler.
-    //        Strictly speaking though, abbr definitions are not exactly the same as link reference definitions, and reusing them is probably going to cause confusion.
     effects.enter('abbrDefinition')
     effects.enter('abbrDefinitionLabel')
     effects.consume(code)
@@ -99,7 +96,8 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // *[HTML]: Hyper Text Markup Language
   //          ^
   function abbrValueStart(code) {
-    effects.enter('abbrValue', { contentType: 'string' })
+    effects.enter('abbrDefinitionValueString')
+    effects.enter(types.chunkString, { contentType: 'string' })
     return abbrValue
   }
 
@@ -108,7 +106,8 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   function abbrValue(code) {
     // TODO - do we need both codes.nul and null here?
     if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul, null].includes(code)) {
-      const token = self.sliceSerialize(effects.exit('abbrValue'))
+      effects.exit(types.chunkString)
+      const token = self.sliceSerialize(effects.exit('abbrDefinitionValueString'))
       const lastDefined = defined[defined.length - 1]
       if (lastDefined && lastDefined['key'] && !lastDefined['value']) {
         lastDefined['value'] = token
