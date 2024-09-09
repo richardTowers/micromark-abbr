@@ -112,8 +112,6 @@ function splitTextByAbbr(textNode, abbreviations) {
  *   Extension for `mdast-util-from-markdown`.
  */
 export function abbrFromMarkdown() {
-  // TODO - how to do abbrCalls :thinking:
-
   return {
     enter: {
       abbrDefinition: enterAbbrDefinition,
