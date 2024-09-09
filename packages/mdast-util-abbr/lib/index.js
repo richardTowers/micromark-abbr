@@ -57,24 +57,33 @@ function splitTextByAbbr(textNode, abbreviations) {
     const definition = abbreviations.find(x => x.label === abbr)
 
     // Add the abbrCall node
-    nodes.push({
-      type: 'abbrCall',
-      data: {
-        label: abbr,
-        title: definition.children[0].value
+    const abbrPosition = {
+      start: {
+        ...position.start,
+        column: position.start.column + abbrStart,
+        offset: position.start.offset + abbrStart,
       },
-      position: {
-        start: {
-          ...position.start,
-          column: position.start.column + abbrStart,
-          offset: position.start.offset + abbrStart,
-        },
-        end: {
-          ...position.end,
-          column: position.start.column + abbrEnd,
-          offset: position.start.offset + abbrEnd,
-        }
+      end: {
+        ...position.end,
+        column: position.start.column + abbrEnd,
+        offset: position.start.offset + abbrEnd,
       }
+    }
+    const title = definition.children[0].value
+    nodes.push({
+      type: 'abbr',
+      abbr,
+      reference: title,
+      children: [
+        { type: 'text', value: abbr, position: abbrPosition }
+      ],
+      data: {
+        hName: 'abbr',
+        hProperties: {
+          title: title,
+        },
+      },
+      position: abbrPosition
     });
 
     // Move the current index forward
@@ -132,7 +141,7 @@ export function abbrFromMarkdown() {
           if (node.type === 'abbrDefinition') {
             return SKIP
           }
-          if (node.type === 'text') {
+          if (node.type === 'text' && parent.type !== 'abbr') {
             const newNodes = splitTextByAbbr(node, abbrDefinitions)
             parent.children.splice(index, 1, ...newNodes)
             return SKIP

@@ -28,7 +28,6 @@ test('abbrFromMarkdown', async function (t) {
           label: 'HTML',
           children: [
             {
-              // TODO parse this properly
               type: 'text',
               value: 'Hyper Text Markup Language',
               position: { start: { line: 1, column: 10, offset: 9 }, end: { line: 1, column: 36, offset: 35 }, }
@@ -62,10 +61,24 @@ test('abbrFromMarkdown', async function (t) {
               }
             },
             {
-              type: 'abbrCall',
+              type: 'abbr',
+              abbr: 'HTML',
+              reference: 'Hyper Text Markup Language',
+              children: [
+                {
+                  type: 'text',
+                  value: 'HTML',
+                  position: {
+                    start: { line: 1, column: 15, offset: 14 },
+                    end: { line: 1, column: 19, offset: 18 }
+                  }
+                }
+              ],
               data: {
-                label: 'HTML',
-                title: 'Hyper Text Markup Language'
+                hName: 'abbr',
+                hProperties: {
+                  title: 'Hyper Text Markup Language'
+                },
               },
               position: {
                 start: { line: 1, column: 15, offset: 14 },
