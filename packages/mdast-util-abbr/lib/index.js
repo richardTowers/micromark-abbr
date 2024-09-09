@@ -40,12 +40,12 @@ function splitTextByAbbr(textNode, abbreviations) {
         value: value.slice(currentIndex, abbrStart),
         position: {
           start: {
-            line: position.start.line,
+            ...position.start,
             column: position.start.column + currentIndex,
             offset: position.start.offset + currentIndex,
           },
           end: {
-            line: position.start.line,
+            ...position.end,
             column: position.start.column + abbrStart,
             offset: position.start.offset + abbrStart,
           }
@@ -65,12 +65,12 @@ function splitTextByAbbr(textNode, abbreviations) {
       },
       position: {
         start: {
-          line: position.start.line,
+          ...position.start,
           column: position.start.column + abbrStart,
           offset: position.start.offset + abbrStart,
         },
         end: {
-          line: position.start.line,
+          ...position.end,
           column: position.start.column + abbrEnd,
           offset: position.start.offset + abbrEnd,
         }
@@ -88,12 +88,12 @@ function splitTextByAbbr(textNode, abbreviations) {
       value: value.slice(currentIndex),
       position: {
         start: {
-          line: position.start.line,
+          ...position.start,
           column: position.start.column + currentIndex,
           offset: position.start.offset + currentIndex,
         },
         end: {
-          line: position.end.line,
+          ...position.end,
           column: position.end.column,
           offset: position.end.offset
         }
