@@ -42,7 +42,7 @@ test('abbrFromMarkdown', async function (t) {
     assert.deepEqual(actual, expected)
   })
 
-  await t.test('should support abbreviation calls somehow', async function () {
+  await t.test('should support abbreviation calls', async function () {
     const actual = fromMarkdown('I like to use HTML because it is cool\n\n*[HTML]: Hyper Text Markup Language', {
       extensions: [abbr],
       mdastExtensions: [abbrFromMarkdown()]
@@ -54,14 +54,29 @@ test('abbrFromMarkdown', async function (t) {
           type: 'paragraph',
           children: [
             {
-              // TODO - parse this and split it into:
-              // - text (I like to use )
-              // - abbrCall (HTML)
-              // - text ( because it is cool)
               type: 'text',
-              value: 'I like to use HTML because it is cool',
+              value: 'I like to use ',
               position: {
                 start: { line: 1, column: 1, offset: 0 },
+                end: { line: 1, column: 15, offset: 14 }
+              }
+            },
+            {
+              type: 'abbrCall',
+              data: {
+                label: 'HTML',
+                title: 'Hyper Text Markup Language'
+              },
+              position: {
+                start: { line: 1, column: 15, offset: 14 },
+                end: { line: 1, column: 19, offset: 18 }
+              }
+            },
+            {
+              type: 'text',
+              value: ' because it is cool',
+              position: {
+                start: { line: 1, column: 19, offset: 18 },
                 end: { line: 1, column: 38, offset: 37 }
               }
             }
