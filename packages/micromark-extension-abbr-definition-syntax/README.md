@@ -1,4 +1,4 @@
-# micromark-extension-abbr
+# micromark-extension-abbr-definition-syntax
 
 [micromark][] extensions to support abbreviations in the style of [PHP's Markdown Extra][php-markdown-extra] and [Kramdown][kramdown-abbreviations].
 

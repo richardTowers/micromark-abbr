@@ -1,5 +1,5 @@
 {
-  "name": "micromark-extension-abbr",
+  "name": "micromark-extension-abbr-definition-syntax",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
