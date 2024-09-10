@@ -1,19 +1,8 @@
-import fs from 'node:fs/promises'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {fromMarkdown} from 'mdast-util-from-markdown'
-import {abbr} from 'micromark-extension-abbr-definition-syntax'
-import {abbrFromMarkdown} from 'mdast-util-abbr'
-import { title } from 'node:process'
-
-test('core', async function (t) {
-  await t.test('should expose the public api', async function () {
-    assert.deepEqual(
-      Object.keys(await import('mdast-util-abbr')).sort(),
-      ['abbrFromMarkdown']
-    )
-  })
-})
+import {micromarkAbbr as abbr} from 'remark-abbr'
+import {mdastUtilAbbrFromMarkdown as abbrFromMarkdown} from 'remark-abbr'
 
 test('abbrFromMarkdown', async function (t) {
   await t.test('should support an abbreviation definition', async function () {

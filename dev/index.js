@@ -1,5 +1,8 @@
-import { abbr } from 'micromark-extension-abbr-definition-syntax'
-import { abbrFromMarkdown } from 'mdast-util-abbr'
+import { abbr } from './lib/micromark-extension-abbr/syntax.js'
+import { abbrFromMarkdown } from './lib/mdast-util-abbr/index.js'
+
+export { abbr as micromarkAbbr } from './lib/micromark-extension-abbr/syntax.js'
+export { abbrFromMarkdown as mdastUtilAbbrFromMarkdown } from './lib/mdast-util-abbr/index.js'
 
 export default function remarkAbbr(options) {
   const self = this
