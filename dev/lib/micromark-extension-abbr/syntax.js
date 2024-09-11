@@ -23,7 +23,6 @@ export const abbrTypes = {
  * @type {Tokenizer}
  */
 function abbrDefinitionTokenize(effects, ok, nok) {
-  // TODO - make this a lot closer to the built it definition tokenizer
   const self = this
 
   return start
@@ -37,7 +36,6 @@ function abbrDefinitionTokenize(effects, ok, nok) {
     return abbrKeyDefinition
   }
 
-  // TODO - use factoryLabel for this
   // *[HTML]: Hyper Text Markup Language
   //  ^
   function abbrKeyDefinition(code) {
