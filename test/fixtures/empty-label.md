@@ -1,0 +1,1 @@
+*[]: Empty labels shouldn't be parsed as abbrDefinitions

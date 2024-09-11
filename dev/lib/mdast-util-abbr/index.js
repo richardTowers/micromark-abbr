@@ -26,7 +26,6 @@ function splitTextByAbbr(textNode, abbreviations) {
   let currentIndex = 0;
 
   const labels = abbreviations.map(x => x.label)
-  // TODO - add a minimum length to labels
   assert(labels.every(l => l.length > 0), 'expected all labels to be non-empty')
 
   // Create a regex to match the abbreviations
