@@ -10,8 +10,9 @@
  * } from 'unist'
  */
 
-import { normalizeIdentifier } from "micromark-util-normalize-identifier"
 import { SKIP, CONTINUE, visit } from "unist-util-visit"
+import { abbrTypes } from "../micromark-extension-abbr/syntax.js"
+import { ok as assert } from 'devlop'
 
 /**
  * 
@@ -23,6 +24,10 @@ function splitTextByAbbr(textNode, abbreviations) {
   const { value, position } = textNode;
   const nodes = [];
   let currentIndex = 0;
+
+  const labels = abbreviations.map(x => x.label)
+  // TODO - add a minimum length to labels
+  assert(labels.every(l => l.length > 0), 'expected all labels to be non-empty')
 
   // Create a regex to match the abbreviations
   const abbrRegex = new RegExp(`\\b(${abbreviations.map(x => x.label).join('|')})\\b`, 'g');
@@ -123,23 +128,23 @@ export function abbrFromMarkdown() {
   return {
     enter: {
       abbrDefinition: enterAbbrDefinition,
-      abbrDefinitionLabelString: enterAbbrDefinitionLabelString,
+      abbrDefinitionLabel: enterAbbrDefinitionLabel,
       abbrDefinitionValueString: enterAbbrDefinitionValueString,
     },
     exit: {
       abbrDefinition: exitAbbrDefinition,
-      abbrDefinitionLabelString: exitAbbrDefinitionLabelString,
+      abbrDefinitionLabel: exitAbbrDefinitionLabel,
       abbrDefinitionValueString: exitAbbrDefinitionValueString,
     },
     transforms: [
       (tree) => {
         // Find the abbrDefinitions - they'll be at the top level
-        const abbrDefinitions = tree.children.filter(x => x.type === 'abbrDefinition')
+        const abbrDefinitions = tree.children.filter(x => x.type === abbrTypes.abbrDefinition)
         if (abbrDefinitions.length === 0) { return tree }
 
         visit(tree, null, (node, index, parent) => {
           // Don't recurse into abbrDefinitions
-          if (node.type === 'abbrDefinition') {
+          if (node.type === abbrTypes.abbrDefinition) {
             return SKIP
           }
           if (node.type === 'text' && parent.type !== 'abbr') {
@@ -159,7 +164,7 @@ export function abbrFromMarkdown() {
    */
   function enterAbbrDefinition(token) {
     this.enter(
-      {type: 'abbrDefinition', identifier: '', label: '', children: []},
+      {type: abbrTypes.abbrDefinition, label: '', children: []},
       token
     )
   }
@@ -168,7 +173,7 @@ export function abbrFromMarkdown() {
    * @this {CompileContext}
    * @type {FromMarkdownHandle}
    */
-  function enterAbbrDefinitionLabelString() {
+  function enterAbbrDefinitionLabel() {
     this.buffer()
   }
 
@@ -176,14 +181,11 @@ export function abbrFromMarkdown() {
    * @this {CompileContext}
    * @type {FromMarkdownHandle}
    */
-  function exitAbbrDefinitionLabelString(token) {
+  function exitAbbrDefinitionLabel(token) {
     const label = this.resume()
     const node = this.stack[this.stack.length - 1]
-    // TODO assert(node.type === 'abbrDefinition')
+    assert(node.type === abbrTypes.abbrDefinition)
     node.label = label
-    node.identifier = normalizeIdentifier(
-      this.sliceSerialize(token)
-    ).toLowerCase()
   }
 
   /**
@@ -198,9 +200,9 @@ export function abbrFromMarkdown() {
    * @this {CompileContext}
    * @type {FromMarkdownHandle}
    */
-  function exitAbbrDefinitionValueString(token) {
-    const node = this.stack.find(node => node.type === 'abbrDefinition')
-    // TODO assert(node is found)
+  function exitAbbrDefinitionValueString() {
+    const node = this.stack.find(node => node.type === abbrTypes.abbrDefinition)
+    assert(node, 'expected to find an abbrDefinition node in the stack')
     node.title = this.resume()
   }
 

@@ -15,7 +15,6 @@ test('abbrFromMarkdown', async function (t) {
       children: [
         {
           type: 'abbrDefinition',
-          identifier: 'html',
           label: 'HTML',
           title: 'Hyper Text Markup Language',
           children: [],
@@ -87,7 +86,6 @@ test('abbrFromMarkdown', async function (t) {
         },
         {
           type: 'abbrDefinition',
-          identifier: 'html',
           label: 'HTML',
           title: 'Hyper Text Markup Language',
           children: [],

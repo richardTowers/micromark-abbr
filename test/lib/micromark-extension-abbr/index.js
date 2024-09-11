@@ -11,9 +11,30 @@ await test('micromark-extension-abbr', async () => {
     const events = postprocess(
       parse({ extensions: [micromarkAbbr] }).document().write(preprocess()(input, null, true))
     )
-    const entry = events.find(event => event[0] === 'enter' && event[1].type === 'abbrDefinition')
-    const exit  = events.find(event => event[0] === 'exit' && event[1].type === 'abbrDefinition')
-    assert(entry)
-    assert(exit)
+    const eventTypes = events.map(e => [e[0], e[1].type])
+    assert.deepEqual(eventTypes, [
+      [ 'enter', 'content' ],
+        [ 'enter', 'abbrDefinition' ],
+          [ 'enter', 'abbrDefinitionLabel' ],
+            [ 'enter', 'abbrDefinitionMarker' ],
+            [ 'exit', 'abbrDefinitionMarker' ],
+            [ 'enter', 'abbrDefinitionString' ],
+              [ 'enter', 'data' ],
+              [ 'exit', 'data' ],
+            [ 'exit', 'abbrDefinitionString' ],
+            [ 'enter', 'abbrDefinitionMarker' ],
+            [ 'exit', 'abbrDefinitionMarker' ],
+          [ 'exit', 'abbrDefinitionLabel' ],
+          [ 'enter', 'abbrDefinitionMarker' ],
+          [ 'exit', 'abbrDefinitionMarker' ],
+          [ 'enter', 'lineSuffix' ],
+          [ 'exit', 'lineSuffix' ],
+          [ 'enter', 'abbrDefinitionValueString' ],
+            [ 'enter', 'data' ],
+            [ 'exit', 'data' ],
+          [ 'exit', 'abbrDefinitionValueString' ],
+        [ 'exit', 'abbrDefinition' ],
+      [ 'exit', 'content' ],
+    ])
   })
 })

@@ -6,7 +6,18 @@
  * } from 'micromark-util-types'
  */
 import { codes, types } from "micromark-util-symbol"
-import { factorySpace } from "micromark-factory-space"
+import { factoryWhitespace } from 'micromark-factory-whitespace'
+import { factoryLabel } from "micromark-factory-label"
+import { ok as assert } from 'devlop'
+import { markdownLineEnding, markdownLineEndingOrSpace } from 'micromark-util-character'
+
+export const abbrTypes = {
+  abbrDefinition: 'abbrDefinition',
+  abbrDefinitionLabel: 'abbrDefinitionLabel',
+  abbrDefinitionMarker: 'abbrDefinitionMarker',
+  abbrDefinitionString: 'abbrDefinitionString',
+  abbrDefinitionValueString: 'abbrDefinitionValueString',
+}
 
 /**
  * @type {Tokenizer}
@@ -14,16 +25,14 @@ import { factorySpace } from "micromark-factory-space"
 function abbrDefinitionTokenize(effects, ok, nok) {
   // TODO - make this a lot closer to the built it definition tokenizer
   const self = this
-  const defined = self.parser.abbrDefinitions || (self.parser.abbrDefinitions = [])
 
   return start
 
   // *[HTML]: Hyper Text Markup Language
   // ^
   function start(code) {
-    // TODO - assertions
-    effects.enter('abbrDefinition')
-    effects.enter('abbrDefinitionLabel')
+    assert(code === codes.asterisk, 'expected `*`')
+    effects.enter(abbrTypes.abbrDefinition)
     effects.consume(code)
     return abbrKeyDefinition
   }
@@ -33,87 +42,60 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //  ^
   function abbrKeyDefinition(code) {
     if (code == codes.leftSquareBracket) {
-      effects.consume(code)
-      return abbrKeyStart
+      return factoryLabel.call(
+        self,
+        effects,
+        abbrKeyValueSeparator,
+        nok,
+        abbrTypes.abbrDefinitionLabel,
+        abbrTypes.abbrDefinitionMarker,
+        abbrTypes.abbrDefinitionString,
+      )(code)
     }
     else {
       return nok(code)
     }
-  }
-
-  // *[HTML]: Hyper Text Markup Language
-  //   ^
-  function abbrKeyStart(code) {
-    // definitions have to have a label, otherwise we get an error from the default definitions handlers
-    effects.enter('abbrDefinitionLabelString')
-    effects.enter(types.chunkString, { contentType: 'string' })
-    return abbrKey
-  }
-
-  // *[HTML]: Hyper Text Markup Language
-  //   ^^^^^
-  function abbrKey(code) {
-    if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul].includes(code)) {
-      return nok(code)
-    }
-
-    if (code === codes.rightSquareBracket) {
-      // TODO sanitize these identifiers
-      // TODO - do this in exit('abbrDefinition') instead so we can get the key and value at the same time?
-      effects.exit('chunkString')
-      const token = self.sliceSerialize(effects.exit('abbrDefinitionLabelString'))
-      if (!defined.find(pair => pair['key'] === token)) {
-        defined.push({ key: token })
-      }
-      effects.consume(code)
-      effects.exit('abbrDefinitionLabel')
-      return abbrKeyValueSeparator
-    }
-
-    effects.consume(code)
-    return abbrKey
   }
 
   // *[HTML]: Hyper Text Markup Language
   //        ^ 
   function abbrKeyValueSeparator(code) {
     if (code === codes.colon) {
-      effects.enter('abbrKeyValueSeparator')
+      effects.enter(abbrTypes.abbrDefinitionMarker)
       effects.consume(code)
-      effects.exit('abbrKeyValueSeparator')
-      return factorySpace(
-        effects,
-        abbrValueStart,
-        'abbrKeyValueWhitespace'
-      )
+      effects.exit(abbrTypes.abbrDefinitionMarker)
+      return abbrKeyValueSeparatorAfter
     }
     else {
       return nok(code)
     }
+  }
 
+  function abbrKeyValueSeparatorAfter(code) {
+    // Note: whitespace is optional.
+    const isSpace = markdownLineEndingOrSpace(code)
+    return isSpace
+      ? factoryWhitespace(effects, abbrValueStart)(code)
+      : abbrValueStart(code)
   }
 
   // *[HTML]: Hyper Text Markup Language
   //          ^
   function abbrValueStart(code) {
-    effects.enter('abbrDefinitionValueString')
+    effects.enter(abbrTypes.abbrDefinitionValueString)
     effects.enter(types.chunkString, { contentType: 'string' })
-    return abbrValue
+    return abbrValue(code)
   }
 
   // *[HTML]: Hyper Text Markup Language
   //          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   function abbrValue(code) {
-    // TODO - do we need both codes.nul and null here?
-    if ([codes.carriageReturn, codes.lineFeed, codes.carriageReturnLineFeed, codes.nul, null].includes(code)) {
+    // TODO - why do we need code === null here?
+    if (code === null || markdownLineEnding(code)) {
       effects.exit(types.chunkString)
-      const token = self.sliceSerialize(effects.exit('abbrDefinitionValueString'))
-      const lastDefined = defined[defined.length - 1]
-      if (lastDefined && lastDefined['key'] && !lastDefined['value']) {
-        lastDefined['value'] = token
-      }
-      effects.exit('abbrDefinition')
-      return ok
+      effects.exit(abbrTypes.abbrDefinitionValueString)
+      effects.exit(abbrTypes.abbrDefinition)
+      return ok(code)
     }
 
     effects.consume(code)
@@ -128,8 +110,6 @@ const contentInitial = {
   [codes.asterisk]: {
     name: 'abbrDefinition',
     tokenize: abbrDefinitionTokenize,
-    continuation: {},
-    exit: function () {}
   }
 }
 
