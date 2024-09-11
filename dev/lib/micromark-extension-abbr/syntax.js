@@ -40,6 +40,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //  ^
   function abbrKeyDefinition(code) {
     if (code == codes.leftSquareBracket) {
+      // TODO - we need to support more stuff than factoryLabel includes - characters like `+` are allowed in abbr labels
       return factoryLabel.call(
         self,
         effects,
