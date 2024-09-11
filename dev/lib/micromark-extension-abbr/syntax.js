@@ -90,8 +90,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // *[HTML]: Hyper Text Markup Language
   //          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   function abbrValue(code) {
-    // TODO - why do we need code === null here?
-    if (code === null || markdownLineEnding(code)) {
+    if (markdownLineEnding(code) || code === codes.eof) {
       effects.exit(types.chunkString)
       effects.exit(abbrTypes.abbrDefinitionValueString)
       effects.exit(abbrTypes.abbrDefinition)
