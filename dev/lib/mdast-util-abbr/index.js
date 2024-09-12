@@ -17,103 +17,121 @@ import { ok as assert } from 'devlop'
 /**
  * 
  * @param {Literal} textNode 
- * @param {{label: string, children: [Literal]}[]} abbreviations 
+ * @param {{label: string, title: string}[]} abbreviations 
  * @returns {Node[]}
  */
 function splitTextByAbbr(textNode, abbreviations) {
-  const { value, position } = textNode;
-  const nodes = [];
-  let currentIndex = 0;
+  // Technically, there can be multiple abbreviation definitions
+  // with the same label. In this case, the last one should win.
+  // We can achieve this by creating a map with the label as the key
+  // and then getting the values
+  const uniqueAbbreviations = abbreviations
+    .reduce((map, abbr) => { map.set(abbr.label, abbr); return map }, new Map())
+    .values()
+    .toArray()
+  
+  const matches = uniqueAbbreviations
+    .map(abbr => [abbr, textNode.value.indexOf(abbr.label)])
+    .filter(([_abbr, index]) => index >= 0)
+    .map(([abbr, index]) => {
+      const start = index
+      const end = index + abbr.label.length - 1
+      return {
+        abbr,
+        start,
+        end,
+        prevChar: textNode.value[start - 1],
+        nextChar: textNode.value[end + 1]
+      }
+    })
+    .filter(match => 
+      // We don't want to match "HTML" inside strings like "HHHHTMLLLLLL", so check that the
+      // surrounding characters are either undefined (i.e. start of string / end of string)
+      // or non-word characters
+      [match.prevChar, match.nextChar].every(c => c === undefined || /^\W$/.test(c))
+    )
+    .sort((l, r) => l.start - r.start)
+  
+  if (matches.length === 0) {
+    return [textNode]
+  }
 
-  const labels = abbreviations.map(x => x.label)
-  assert(labels.every(l => l.length > 0), 'expected all labels to be non-empty')
-
-  // Create a regex to match the abbreviations
-  const abbrRegex = new RegExp(`\\b(${abbreviations.map(x => x.label).join('|')})\\b`, 'g');
-
-  let match;
-  while ((match = abbrRegex.exec(value)) !== null) {
-    const [abbr] = match;
-    const abbrStart = match.index;
-    const abbrEnd = abbrStart + abbr.length;
-
-    // Add the text before the abbreviation
-    if (abbrStart > currentIndex) {
+  const nodes = []
+  let currentIndex = 0
+  for (const match of matches) {
+    if (match.start > currentIndex) {
       nodes.push({
         type: 'text',
-        value: value.slice(currentIndex, abbrStart),
+        value: textNode.value.slice(currentIndex, match.start),
         position: {
           start: {
-            ...position.start,
-            column: position.start.column + currentIndex,
-            offset: position.start.offset + currentIndex,
+            line: textNode.position.start.line,
+            column: textNode.position.start.column + currentIndex,
+            offset: textNode.position.start.offset + currentIndex,
           },
           end: {
-            ...position.end,
-            column: position.start.column + abbrStart,
-            offset: position.start.offset + abbrStart,
+            line: textNode.position.start.line,
+            column: textNode.position.start.column + match.start,
+            offset: textNode.position.start.offset + match.start,
           }
         }
-      });
+      })
     }
 
-    // Find the abbrDefinition for this match
-    const definition = abbreviations.find(x => x.label === abbr)
-
-    // Add the abbrCall node
     const abbrPosition = {
       start: {
-        ...position.start,
-        column: position.start.column + abbrStart,
-        offset: position.start.offset + abbrStart,
+        line: textNode.position.start.line,
+        column: textNode.position.start.column + match.start,
+        offset: textNode.position.start.offset + match.start,
       },
       end: {
-        ...position.end,
-        column: position.start.column + abbrEnd,
-        offset: position.start.offset + abbrEnd,
+        line: textNode.position.end.line,
+        column: textNode.position.start.column + match.end + 1, // TODO - not sure about the +1 here
+        offset: textNode.position.start.offset + match.end + 1,
       }
     }
+
     nodes.push({
       type: 'abbr',
-      abbr,
-      reference: definition.title,
+      abbr: match.abbr.label,
+      reference: match.abbr.title,
       children: [
-        { type: 'text', value: abbr, position: abbrPosition }
+        { type: 'text', value: match.abbr.label, position: abbrPosition }
       ],
       data: {
         hName: 'abbr',
         hProperties: {
-          title: definition.title,
-        },
+          title: match.abbr.title
+        }
       },
       position: abbrPosition
-    });
+    })
 
-    // Move the current index forward
-    currentIndex = abbrEnd;
+    // Move the position forwards
+    currentIndex = match.end + 1
   }
 
-  // Add the remaining text after the last abbreviation
-  if (currentIndex < value.length) {
+  // If the final abbreviation wasn't at the very end of the value,
+  // add one final text node with the remainder of the value
+  if (currentIndex < textNode.value.length) {
     nodes.push({
       type: 'text',
-      value: value.slice(currentIndex),
+      value: textNode.value.slice(currentIndex),
       position: {
         start: {
-          ...position.start,
-          column: position.start.column + currentIndex,
-          offset: position.start.offset + currentIndex,
+          line: textNode.position.start.line,
+          column: textNode.position.start.column + currentIndex,
+          offset: textNode.position.start.offset + currentIndex,
         },
         end: {
-          ...position.end,
-          column: position.end.column,
-          offset: position.end.offset
+          line: textNode.position.start.line,
+          column: textNode.position.end.column,
+          offset: textNode.position.end.offset,
         }
       }
-    });
+    })
   }
-
-  return nodes;
+  return nodes
 }
 
 /**

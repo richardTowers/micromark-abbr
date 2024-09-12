@@ -46,4 +46,14 @@ await test('micromark-extension-abbr', async (t) => {
     const abbrDefinitions = events.filter(e => e[1].type === micromarkAbbrTypes.abbrDefinition)
     assert.deepEqual(abbrDefinitions, [])
   })
+
+  await t.test('parses definitions with labels containing spaces and punctuation', async () => {
+    const input = `*[MV(VSL) (E&W)]: Motor Vehicles (Variation of Speed Limits) (England & Wales) Regulations`
+    const events = postprocess(
+      parse({ extensions: [micromarkAbbr] }).document().write(preprocess()(input, null, true))
+    )
+    const abbrDefinitionString = events.find(e => e[1].type === micromarkAbbrTypes.abbrDefinitionString)
+    const [_, token, context] = abbrDefinitionString
+    assert.deepEqual(context.sliceSerialize(token), 'MV(VSL) (E&W)')
+  })
 })
