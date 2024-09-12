@@ -10,14 +10,14 @@
  * } from 'unist'
  */
 
-import { SKIP, CONTINUE, visit } from "unist-util-visit"
-import { abbrTypes } from "../micromark-extension-abbr/syntax.js"
-import { ok as assert } from 'devlop'
+import {SKIP, CONTINUE, visit} from 'unist-util-visit'
+import {abbrTypes} from '../micromark-extension-abbr/syntax.js'
+import {ok as assert} from 'devlop'
 
 /**
- * 
- * @param {Literal} textNode 
- * @param {{label: string, title: string}[]} abbreviations 
+ *
+ * @param {Literal} textNode
+ * @param {{label: string, title: string}[]} abbreviations
  * @returns {Node[]}
  */
 function splitTextByAbbr(textNode, abbreviations) {
@@ -26,12 +26,15 @@ function splitTextByAbbr(textNode, abbreviations) {
   // We can achieve this by creating a map with the label as the key
   // and then getting the values
   const uniqueAbbreviations = abbreviations
-    .reduce((map, abbr) => { map.set(abbr.label, abbr); return map }, new Map())
+    .reduce((map, abbr) => {
+      map.set(abbr.label, abbr)
+      return map
+    }, new Map())
     .values()
     .toArray()
-  
+
   const matches = uniqueAbbreviations
-    .map(abbr => [abbr, textNode.value.indexOf(abbr.label)])
+    .map((abbr) => [abbr, textNode.value.indexOf(abbr.label)])
     .filter(([_abbr, index]) => index >= 0)
     .map(([abbr, index]) => {
       const start = index
@@ -41,17 +44,19 @@ function splitTextByAbbr(textNode, abbreviations) {
         start,
         end,
         prevChar: textNode.value[start - 1],
-        nextChar: textNode.value[end + 1]
+        nextChar: textNode.value[end + 1],
       }
     })
-    .filter(match => 
+    .filter((match) =>
       // We don't want to match "HTML" inside strings like "HHHHTMLLLLLL", so check that the
       // surrounding characters are either undefined (i.e. start of string / end of string)
       // or non-word characters
-      [match.prevChar, match.nextChar].every(c => c === undefined || /^\W$/.test(c))
+      [match.prevChar, match.nextChar].every(
+        (c) => c === undefined || /^\W$/.test(c),
+      ),
     )
     .sort((l, r) => l.start - r.start)
-  
+
   if (matches.length === 0) {
     return [textNode]
   }
@@ -73,8 +78,8 @@ function splitTextByAbbr(textNode, abbreviations) {
             line: textNode.position.start.line,
             column: textNode.position.start.column + match.start,
             offset: textNode.position.start.offset + match.start,
-          }
-        }
+          },
+        },
       })
     }
 
@@ -88,7 +93,7 @@ function splitTextByAbbr(textNode, abbreviations) {
         line: textNode.position.end.line,
         column: textNode.position.start.column + match.end + 1, // TODO - not sure about the +1 here
         offset: textNode.position.start.offset + match.end + 1,
-      }
+      },
     }
 
     nodes.push({
@@ -96,15 +101,15 @@ function splitTextByAbbr(textNode, abbreviations) {
       abbr: match.abbr.label,
       reference: match.abbr.title,
       children: [
-        { type: 'text', value: match.abbr.label, position: abbrPosition }
+        {type: 'text', value: match.abbr.label, position: abbrPosition},
       ],
       data: {
         hName: 'abbr',
         hProperties: {
-          title: match.abbr.title
-        }
+          title: match.abbr.title,
+        },
       },
-      position: abbrPosition
+      position: abbrPosition,
     })
 
     // Move the position forwards
@@ -127,8 +132,8 @@ function splitTextByAbbr(textNode, abbreviations) {
           line: textNode.position.start.line,
           column: textNode.position.end.column,
           offset: textNode.position.end.offset,
-        }
-      }
+        },
+      },
     })
   }
   return nodes
@@ -156,8 +161,12 @@ export function abbrFromMarkdown() {
     transforms: [
       (tree) => {
         // Find the abbrDefinitions - they'll be at the top level
-        const abbrDefinitions = tree.children.filter(x => x.type === abbrTypes.abbrDefinition)
-        if (abbrDefinitions.length === 0) { return tree }
+        const abbrDefinitions = tree.children.filter(
+          (x) => x.type === abbrTypes.abbrDefinition,
+        )
+        if (abbrDefinitions.length === 0) {
+          return tree
+        }
 
         visit(tree, null, (node, index, parent) => {
           // Don't recurse into abbrDefinitions
@@ -171,8 +180,8 @@ export function abbrFromMarkdown() {
           }
           return CONTINUE
         })
-      }
-    ]
+      },
+    ],
   }
 
   /**
@@ -180,10 +189,7 @@ export function abbrFromMarkdown() {
    * @type {FromMarkdownHandle}
    */
   function enterAbbrDefinition(token) {
-    this.enter(
-      {type: abbrTypes.abbrDefinition, label: '', children: []},
-      token
-    )
+    this.enter({type: abbrTypes.abbrDefinition, label: '', children: []}, token)
   }
 
   /**
@@ -218,7 +224,9 @@ export function abbrFromMarkdown() {
    * @type {FromMarkdownHandle}
    */
   function exitAbbrDefinitionValueString() {
-    const node = this.stack.find(node => node.type === abbrTypes.abbrDefinition)
+    const node = this.stack.find(
+      (node) => node.type === abbrTypes.abbrDefinition,
+    )
     assert(node, 'expected to find an abbrDefinition node in the stack')
     node.title = this.resume()
   }
@@ -230,5 +238,4 @@ export function abbrFromMarkdown() {
   function exitAbbrDefinition(token) {
     this.exit(token)
   }
-
 }

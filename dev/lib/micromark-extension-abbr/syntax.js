@@ -5,11 +5,14 @@
  *   Tokenizer
  * } from 'micromark-util-types'
  */
-import { codes, types } from "micromark-util-symbol"
-import { factoryWhitespace } from 'micromark-factory-whitespace'
-import { factoryLabel } from "micromark-factory-label"
-import { ok as assert } from 'devlop'
-import { markdownLineEnding, markdownLineEndingOrSpace } from 'micromark-util-character'
+import {codes, types} from 'micromark-util-symbol'
+import {factoryWhitespace} from 'micromark-factory-whitespace'
+import {factoryLabel} from 'micromark-factory-label'
+import {ok as assert} from 'devlop'
+import {
+  markdownLineEnding,
+  markdownLineEndingOrSpace,
+} from 'micromark-util-character'
 
 export const abbrTypes = {
   abbrDefinition: 'abbrDefinition',
@@ -51,22 +54,20 @@ function abbrDefinitionTokenize(effects, ok, nok) {
         abbrTypes.abbrDefinitionMarker,
         abbrTypes.abbrDefinitionString,
       )(code)
-    }
-    else {
+    } else {
       return nok(code)
     }
   }
 
   // *[HTML]: Hyper Text Markup Language
-  //        ^ 
+  //        ^
   function abbrKeyValueSeparator(code) {
     if (code === codes.colon) {
       effects.enter(abbrTypes.abbrDefinitionMarker)
       effects.consume(code)
       effects.exit(abbrTypes.abbrDefinitionMarker)
       return abbrKeyValueSeparatorAfter
-    }
-    else {
+    } else {
       return nok(code)
     }
   }
@@ -83,7 +84,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   //          ^
   function abbrValueStart(code) {
     effects.enter(abbrTypes.abbrDefinitionValueString)
-    effects.enter(types.chunkString, { contentType: 'string' })
+    effects.enter(types.chunkString, {contentType: 'string'})
     return abbrValue(code)
   }
 
@@ -109,12 +110,12 @@ const contentInitial = {
   [codes.asterisk]: {
     name: 'abbrDefinition',
     tokenize: abbrDefinitionTokenize,
-  }
+  },
 }
 
 /**
  * @type {Extension}
  */
 export const abbr = {
-  contentInitial
+  contentInitial,
 }

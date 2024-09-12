@@ -4,8 +4,16 @@
   "main": "dev/index.js",
   "scripts": {
     "build": "micromark-build",
-    "format": "prettier . -w --log-level warn && xo --fix",
+    "format": "prettier . -w --log-level warn",
     "test": "node --test"
+  },
+  "prettier": {
+    "bracketSpacing": false,
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "useTabs": false
   },
   "keywords": [
     "abbr",
