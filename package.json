@@ -4,7 +4,7 @@
   "main": "dev/index.js",
   "scripts": {
     "build": "micromark-build",
-    "format": "prettier . -w --log-level warn",
+    "format": "prettier . -w --log-level warn && xo --fix",
     "test": "node --test"
   },
   "prettier": {
@@ -14,6 +14,20 @@
     "tabWidth": 2,
     "trailingComma": "all",
     "useTabs": false
+  },
+  "xo": {
+    "envs": [
+      "shared-node-browser"
+    ],
+    "prettier": true,
+    "rules": {
+      "logical-assignment-operators": "off",
+      "max-depth": "off",
+      "unicorn/no-this-assignment": "off",
+      "unicorn/prefer-at": "off",
+      "unicorn/prefer-code-point": "off",
+      "unicorn/prefer-event-target": "off"
+    }
   },
   "keywords": [
     "abbr",

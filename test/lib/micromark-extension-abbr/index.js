@@ -1,8 +1,6 @@
-import {preprocess, parse, postprocess, micromark} from 'micromark'
-
 import assert from 'node:assert/strict'
 import test from 'node:test'
-
+import {preprocess, parse, postprocess, micromark} from 'micromark'
 import {micromarkAbbr, micromarkAbbrTypes} from 'remark-abbr'
 
 await test('micromark-extension-abbr', async (t) => {

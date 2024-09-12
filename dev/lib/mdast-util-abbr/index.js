@@ -11,8 +11,8 @@
  */
 
 import {SKIP, CONTINUE, visit} from 'unist-util-visit'
-import {abbrTypes} from '../micromark-extension-abbr/syntax.js'
 import {ok as assert} from 'devlop'
+import {abbrTypes} from '../micromark-extension-abbr/syntax.js'
 
 /**
  *
@@ -136,6 +136,7 @@ function splitTextByAbbr(textNode, abbreviations) {
       },
     })
   }
+
   return nodes
 }
 
@@ -173,11 +174,13 @@ export function abbrFromMarkdown() {
           if (node.type === abbrTypes.abbrDefinition) {
             return SKIP
           }
+
           if (node.type === 'text' && parent.type !== 'abbr') {
             const newNodes = splitTextByAbbr(node, abbrDefinitions)
             parent.children.splice(index, 1, ...newNodes)
             return SKIP
           }
+
           return CONTINUE
         })
       },

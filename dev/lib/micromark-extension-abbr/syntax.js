@@ -28,7 +28,7 @@ export const abbrTypes = {
 function abbrDefinitionTokenize(effects, ok, nok) {
   const self = this
   const minLabelLength = 1
-  let labelLength = 0
+  const labelLength = 0
 
   return start
 
@@ -54,9 +54,9 @@ function abbrDefinitionTokenize(effects, ok, nok) {
         abbrTypes.abbrDefinitionMarker,
         abbrTypes.abbrDefinitionString,
       )(code)
-    } else {
-      return nok(code)
     }
+
+    return nok(code)
   }
 
   // *[HTML]: Hyper Text Markup Language
@@ -67,9 +67,9 @@ function abbrDefinitionTokenize(effects, ok, nok) {
       effects.consume(code)
       effects.exit(abbrTypes.abbrDefinitionMarker)
       return abbrKeyValueSeparatorAfter
-    } else {
-      return nok(code)
     }
+
+    return nok(code)
   }
 
   function abbrKeyValueSeparatorAfter(code) {
