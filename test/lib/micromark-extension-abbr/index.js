@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {preprocess, parse, postprocess, micromark} from 'micromark'
+import {preprocess, parse, postprocess} from 'micromark'
 import {micromarkAbbr, micromarkAbbrTypes} from 'remark-abbr'
 
 await test('micromark-extension-abbr', async (t) => {
@@ -11,7 +11,7 @@ await test('micromark-extension-abbr', async (t) => {
         .document()
         .write(preprocess()(input, null, true)),
     )
-    const eventTypes = events.map((e) => [e[0], e[1].type])
+    const eventTypes = events.map((event) => [event[0], event[1].type])
     assert.deepEqual(
       eventTypes,
       // prettier-ignore
@@ -50,7 +50,7 @@ await test('micromark-extension-abbr', async (t) => {
         .write(preprocess()(input, null, true)),
     )
     const abbrDefinitions = events.filter(
-      (e) => e[1].type === micromarkAbbrTypes.abbrDefinition,
+      (event) => event[1].type === micromarkAbbrTypes.abbrDefinition,
     )
     assert.deepEqual(abbrDefinitions, [])
   })
@@ -65,7 +65,7 @@ await test('micromark-extension-abbr', async (t) => {
           .write(preprocess()(input, null, true)),
       )
       const abbrDefinitionString = events.find(
-        (e) => e[1].type === micromarkAbbrTypes.abbrDefinitionString,
+        (event) => event[1].type === micromarkAbbrTypes.abbrDefinitionString,
       )
       const [_, token, context] = abbrDefinitionString
       assert.deepEqual(context.sliceSerialize(token), 'MV(VSL) (E&W)')

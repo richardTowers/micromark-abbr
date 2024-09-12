@@ -20,6 +20,16 @@
       "shared-node-browser"
     ],
     "prettier": true,
+    "overrides": [
+      {
+        "files": [
+          "test/**/*.js"
+        ],
+        "rules": {
+          "no-await-in-loop": "off"
+        }
+      }
+    ],
     "rules": {
       "logical-assignment-operators": "off",
       "max-depth": "off",

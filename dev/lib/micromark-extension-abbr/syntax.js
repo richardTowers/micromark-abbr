@@ -27,8 +27,6 @@ export const abbrTypes = {
  */
 function abbrDefinitionTokenize(effects, ok, nok) {
   const self = this
-  const minLabelLength = 1
-  const labelLength = 0
 
   return start
 
@@ -44,7 +42,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
   // *[HTML]: Hyper Text Markup Language
   //  ^
   function abbrKeyDefinition(code) {
-    if (code == codes.leftSquareBracket) {
+    if (code === codes.leftSquareBracket) {
       return factoryLabel.call(
         self,
         effects,

@@ -25,13 +25,12 @@ function splitTextByAbbr(textNode, abbreviations) {
   // with the same label. In this case, the last one should win.
   // We can achieve this by creating a map with the label as the key
   // and then getting the values
-  const uniqueAbbreviations = abbreviations
-    .reduce((map, abbr) => {
-      map.set(abbr.label, abbr)
-      return map
-    }, new Map())
-    .values()
-    .toArray()
+  const uniqueAbbreviationMap = new Map()
+  for (const abbreviation of abbreviations) {
+    uniqueAbbreviationMap.set(abbreviation.label, abbreviation)
+  }
+
+  const uniqueAbbreviations = uniqueAbbreviationMap.values().toArray()
 
   const matches = uniqueAbbreviations
     .map((abbr) => [abbr, textNode.value.indexOf(abbr.label)])
@@ -91,7 +90,7 @@ function splitTextByAbbr(textNode, abbreviations) {
       },
       end: {
         line: textNode.position.end.line,
-        column: textNode.position.start.column + match.end + 1, // TODO - not sure about the +1 here
+        column: textNode.position.start.column + match.end + 1,
         offset: textNode.position.start.offset + match.end + 1,
       },
     }
@@ -207,7 +206,7 @@ export function abbrFromMarkdown() {
    * @this {CompileContext}
    * @type {FromMarkdownHandle}
    */
-  function exitAbbrDefinitionLabel(token) {
+  function exitAbbrDefinitionLabel() {
     const label = this.resume()
     const node = this.stack[this.stack.length - 1]
     assert(node.type === abbrTypes.abbrDefinition)

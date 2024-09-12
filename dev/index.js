@@ -7,7 +7,7 @@ export {
 } from './lib/micromark-extension-abbr/syntax.js'
 export {abbrFromMarkdown as mdastUtilAbbrFromMarkdown} from './lib/mdast-util-abbr/index.js'
 
-export default function remarkAbbr(options) {
+export default function remarkAbbr() {
   const self = this
   const data = self.data()
 
@@ -15,7 +15,6 @@ export default function remarkAbbr(options) {
     data.micromarkExtensions || (data.micromarkExtensions = [])
   const fromMarkdownExtensions =
     data.fromMarkdownExtensions || (data.fromMarkdownExtensions = [])
-  const rehmarkRehypeOptions = data.options || (data.options = {})
 
   micromarkExtensions.push(abbr)
   fromMarkdownExtensions.push(abbrFromMarkdown())

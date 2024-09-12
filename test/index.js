@@ -5,7 +5,7 @@ import {unified} from 'unified'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import rehypeStringify from 'rehype-stringify'
-import {default as remarkAbbr, micromarkAbbrTypes} from 'remark-abbr'
+import remarkAbbr, {micromarkAbbrTypes} from 'remark-abbr'
 
 test('fixtures', async function (t) {
   const base = new URL('fixtures/', import.meta.url)
@@ -29,7 +29,7 @@ test('fixtures', async function (t) {
         .use(remarkRehype, {
           handlers: {
             // Prevent empty divs
-            // TODO - is there a way to get remarkAbbr to add this? Or to make it not needed?
+            // NOTE - is there a way to get remarkAbbr to add this? Or to make it not needed?
             [micromarkAbbrTypes.abbrDefinition]: () => undefined,
           },
         })
