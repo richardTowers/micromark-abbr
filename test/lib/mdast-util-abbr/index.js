@@ -4,7 +4,7 @@ import {fromMarkdown} from 'mdast-util-from-markdown'
 import {
   micromarkAbbr as abbr,
   mdastUtilAbbrFromMarkdown as abbrFromMarkdown,
-} from 'remark-abbr'
+} from '@richardtowers/remark-abbr'
 
 test('abbrFromMarkdown', async function (t) {
   await t.test('should support an abbreviation definition', async function () {

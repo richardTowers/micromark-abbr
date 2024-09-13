@@ -5,7 +5,7 @@ import {unified} from 'unified'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import rehypeStringify from 'rehype-stringify'
-import remarkAbbr, {micromarkAbbrTypes} from 'remark-abbr'
+import remarkAbbr, {micromarkAbbrTypes} from '@richardtowers/remark-abbr'
 
 test('fixtures', async function (t) {
   const base = new URL('fixtures/', import.meta.url)
