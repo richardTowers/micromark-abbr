@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "main": "dev/index.js",
   "scripts": {
-    "build": "micromark-build",
+    "build": "tsc --build --clean && micromark-build",
     "format": "prettier . -w --log-level warn && xo --fix",
     "test-dev": "node --conditions development --test",
     "test-prod": "node --conditions production --test",
     "test-api": "npm run test-dev && npm run test-prod",
     "test-coverage": "c8 --100 --reporter lcov npm run test-api",
-    "test": "npm run format && npm run test-coverage"
+    "test": "npm run build && npm run format && npm run test-coverage"
   },
   "prettier": {
     "bracketSpacing": false,
@@ -62,7 +62,8 @@
   "type": "module",
   "description": "",
   "exports": {
-    "default": "./dev/index.js"
+    "development": "./dev/index.js",
+    "default": "./index.js"
   },
   "dependencies": {
     "devlop": "^1.1.0",
@@ -85,6 +86,7 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.0",
     "remark-stringify": "^11.0.0",
+    "typescript": "^5.6.2",
     "unified": "^11.0.5",
     "xo": "^0.59.3"
   }

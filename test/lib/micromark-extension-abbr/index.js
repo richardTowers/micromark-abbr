@@ -132,8 +132,12 @@ await test('micromark-extension-abbr', async (t) => {
       const abbrDefinitionString = events.find(
         (event) => event[1].type === micromarkAbbrTypes.abbrDefinitionString,
       )
-      const [_, token, context] = abbrDefinitionString
-      assert.deepEqual(context.sliceSerialize(token), 'MV(VSL) (E&W)')
+      if (abbrDefinitionString === undefined) {
+        assert.fail('could not find an abbrDefinitionString')
+      } else {
+        const [_, token, context] = abbrDefinitionString
+        assert.deepEqual(context.sliceSerialize(token), 'MV(VSL) (E&W)')
+      }
     },
   )
 })

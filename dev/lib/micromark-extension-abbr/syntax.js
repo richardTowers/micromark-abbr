@@ -2,6 +2,7 @@
  * @import {
  *   ConstructRecord,
  *   Extension,
+ *   State,
  *   Tokenizer
  * } from 'micromark-util-types'
  */
@@ -14,6 +15,9 @@ import {
   markdownLineEndingOrSpace,
 } from 'micromark-util-character'
 
+/**
+ * @type {Record<any, any>}
+ */
 export const abbrTypes = {
   abbrDefinition: 'abbrDefinition',
   abbrDefinitionLabel: 'abbrDefinitionLabel',
@@ -30,8 +34,12 @@ function abbrDefinitionTokenize(effects, ok, nok) {
 
   return start
 
-  // *[HTML]: Hyper Text Markup Language
-  // ^
+  /**
+   * @type {State}
+   *
+   * *[HTML]: Hyper Text Markup Language
+   * ^
+   */
   function start(code) {
     assert(code === codes.asterisk, 'expected `*`')
     effects.enter(abbrTypes.abbrDefinition)
@@ -39,8 +47,12 @@ function abbrDefinitionTokenize(effects, ok, nok) {
     return abbrKeyDefinition
   }
 
-  // *[HTML]: Hyper Text Markup Language
-  //  ^
+  /**
+   * @type {State}
+   *
+   * *[HTML]: Hyper Text Markup Language
+   *  ^
+   */
   function abbrKeyDefinition(code) {
     if (code === codes.leftSquareBracket) {
       return factoryLabel.call(
@@ -57,8 +69,12 @@ function abbrDefinitionTokenize(effects, ok, nok) {
     return nok(code)
   }
 
-  // *[HTML]: Hyper Text Markup Language
-  //        ^
+  /**
+   * @type {State}
+   *
+   * *[HTML]: Hyper Text Markup Language
+   *        ^
+   */
   function abbrKeyValueSeparator(code) {
     if (code === codes.colon) {
       effects.enter(abbrTypes.abbrDefinitionMarker)
@@ -70,6 +86,12 @@ function abbrDefinitionTokenize(effects, ok, nok) {
     return nok(code)
   }
 
+  /**
+   * @type {State}
+   *
+   * *[HTML]: Hyper Text Markup Language
+   *         ^
+   */
   function abbrKeyValueSeparatorAfter(code) {
     // Note: whitespace is optional.
     const isSpace = markdownLineEndingOrSpace(code)
@@ -78,16 +100,24 @@ function abbrDefinitionTokenize(effects, ok, nok) {
       : abbrValueStart(code)
   }
 
-  // *[HTML]: Hyper Text Markup Language
-  //          ^
+  /**
+   * @type {State}
+   *
+   * *[HTML]: Hyper Text Markup Language
+   *          ^
+   */
   function abbrValueStart(code) {
     effects.enter(abbrTypes.abbrDefinitionValueString)
     effects.enter(types.chunkString, {contentType: 'string'})
     return abbrValue(code)
   }
 
-  // *[HTML]: Hyper Text Markup Language
-  //          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  /**
+   * @type {State}
+   *
+   * *[HTML]: Hyper Text Markup Language
+   *          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   */
   function abbrValue(code) {
     if (markdownLineEnding(code) || code === codes.eof) {
       effects.exit(types.chunkString)
