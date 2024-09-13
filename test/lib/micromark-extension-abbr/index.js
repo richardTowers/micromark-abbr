@@ -91,18 +91,21 @@ await test('micromark-extension-abbr', async (t) => {
     assert.deepEqual(abbrDefinitions, [])
   })
 
-  await t.test('does not parse definitions with parens instead of square brackets', async () => {
-    const input = `*(HTML): Hyper Text Markup Language`
-    const events = postprocess(
-      parse({extensions: [micromarkAbbr]})
-        .document()
-        .write(preprocess()(input, null, true)),
-    )
-    const abbrDefinitions = events.filter(
-      (event) => event[1].type === micromarkAbbrTypes.abbrDefinition,
-    )
-    assert.deepEqual(abbrDefinitions, [])
-  })
+  await t.test(
+    'does not parse definitions with parens instead of square brackets',
+    async () => {
+      const input = `*(HTML): Hyper Text Markup Language`
+      const events = postprocess(
+        parse({extensions: [micromarkAbbr]})
+          .document()
+          .write(preprocess()(input, null, true)),
+      )
+      const abbrDefinitions = events.filter(
+        (event) => event[1].type === micromarkAbbrTypes.abbrDefinition,
+      )
+      assert.deepEqual(abbrDefinitions, [])
+    },
+  )
 
   await t.test('does not parse definitions without colons', async () => {
     const input = `*[HTML]; Hyper Text Markup Language`

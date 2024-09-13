@@ -7,7 +7,9 @@
     "format": "prettier . -w --log-level warn && xo --fix",
     "test-dev": "node --conditions development --test",
     "test-prod": "node --conditions production --test",
-    "test": "npm run test-dev && npm run test-prod"
+    "test-api": "npm run test-dev && npm run test-prod",
+    "test-coverage": "c8 --100 --reporter lcov npm run test-api",
+    "test": "npm run format && npm run test-coverage"
   },
   "prettier": {
     "bracketSpacing": false,
