@@ -42,8 +42,70 @@ await test('micromark-extension-abbr', async (t) => {
     )
   })
 
+  await t.test('parses definitions without whitespace', async () => {
+    const input = `*[HTML]:Hyper Text Markup Language`
+    const events = postprocess(
+      parse({extensions: [micromarkAbbr]})
+        .document()
+        .write(preprocess()(input, null, true)),
+    )
+    const eventTypes = events.map((event) => [event[0], event[1].type])
+    assert.deepEqual(
+      eventTypes,
+      // prettier-ignore
+      [
+        [ 'enter', 'content' ],
+          [ 'enter', 'abbrDefinition' ],
+            [ 'enter', 'abbrDefinitionLabel' ],
+              [ 'enter', 'abbrDefinitionMarker' ],
+              [ 'exit', 'abbrDefinitionMarker' ],
+              [ 'enter', 'abbrDefinitionString' ],
+                [ 'enter', 'data' ],
+                [ 'exit', 'data' ],
+              [ 'exit', 'abbrDefinitionString' ],
+              [ 'enter', 'abbrDefinitionMarker' ],
+              [ 'exit', 'abbrDefinitionMarker' ],
+            [ 'exit', 'abbrDefinitionLabel' ],
+            [ 'enter', 'abbrDefinitionMarker' ],
+            [ 'exit', 'abbrDefinitionMarker' ],
+            [ 'enter', 'abbrDefinitionValueString' ],
+              [ 'enter', 'data' ],
+              [ 'exit', 'data' ],
+            [ 'exit', 'abbrDefinitionValueString' ],
+          [ 'exit', 'abbrDefinition' ],
+        [ 'exit', 'content' ],
+    ],
+    )
+  })
+
   await t.test('does not parse definitions with empty labels', async () => {
     const input = `*[]: Empty`
+    const events = postprocess(
+      parse({extensions: [micromarkAbbr]})
+        .document()
+        .write(preprocess()(input, null, true)),
+    )
+    const abbrDefinitions = events.filter(
+      (event) => event[1].type === micromarkAbbrTypes.abbrDefinition,
+    )
+    assert.deepEqual(abbrDefinitions, [])
+  })
+
+  await t.test('does not parse definitions with parens instead of square brackets', async () => {
+    const input = `*(HTML): Hyper Text Markup Language`
+    const events = postprocess(
+      parse({extensions: [micromarkAbbr]})
+        .document()
+        .write(preprocess()(input, null, true)),
+    )
+    const abbrDefinitions = events.filter(
+      (event) => event[1].type === micromarkAbbrTypes.abbrDefinition,
+    )
+    assert.deepEqual(abbrDefinitions, [])
+  })
+
+  await t.test('does not parse definitions without colons', async () => {
+    const input = `*[HTML]; Hyper Text Markup Language`
     const events = postprocess(
       parse({extensions: [micromarkAbbr]})
         .document()

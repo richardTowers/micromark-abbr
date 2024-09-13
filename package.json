@@ -76,6 +76,7 @@
   "devDependencies": {
     "@types/mdast": "^4.0.4",
     "@types/unist": "^3.0.3",
+    "c8": "^10.1.2",
     "micromark-build": "^2.0.2",
     "prettier": "^3.3.3",
     "rehype-stringify": "^10.0.0",
