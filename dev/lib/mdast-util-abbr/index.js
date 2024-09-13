@@ -30,7 +30,7 @@ function splitTextByAbbr(textNode, abbreviations) {
     uniqueAbbreviationMap.set(abbreviation.label, abbreviation)
   }
 
-  const uniqueAbbreviations = uniqueAbbreviationMap.values().toArray()
+  const uniqueAbbreviations = [...uniqueAbbreviationMap.values()]
 
   const matches = uniqueAbbreviations
     .map((abbr) => [abbr, textNode.value.indexOf(abbr.label)])
