@@ -2,7 +2,6 @@
 
 ## TODO
 
-- github actions
 - test coverage
 - more tests?
 - typescript coverage

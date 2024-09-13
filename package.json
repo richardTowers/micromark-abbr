@@ -5,7 +5,9 @@
   "scripts": {
     "build": "micromark-build",
     "format": "prettier . -w --log-level warn && xo --fix",
-    "test": "node --test"
+    "test-dev": "node --conditions development --test",
+    "test-prod": "node --conditions production --test",
+    "test": "npm run test-dev && npm run test-prod"
   },
   "prettier": {
     "bracketSpacing": false,
