@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dev/index.js",
   "scripts": {
-    "build": "tsc --build --clean && micromark-build",
+    "build": "tsc --build --clean && tsc --build && type-coverage && micromark-build",
     "format": "prettier . -w --log-level warn && xo --fix",
     "test-dev": "node --conditions development --test",
     "test-prod": "node --conditions production --test",
@@ -86,6 +86,7 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.0",
     "remark-stringify": "^11.0.0",
+    "type-coverage": "^2.29.1",
     "typescript": "^5.6.2",
     "unified": "^11.0.5",
     "xo": "^0.59.3"

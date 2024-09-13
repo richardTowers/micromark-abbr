@@ -5,8 +5,7 @@
  *   Handle as FromMarkdownHandle
  * } from 'mdast-util-from-markdown'
  * @import {
- *   Literal,
- *   Node
+ *   Node,
  * } from 'unist'
  */
 
@@ -16,7 +15,7 @@ import {abbrTypes} from '../micromark-extension-abbr/syntax.js'
 
 /**
  *
- * @param {Literal} textNode
+ * @param {any} textNode
  * @param {{label: string, title: string}[]} abbreviations
  * @returns {Node[]}
  */
@@ -160,7 +159,10 @@ export function abbrFromMarkdown() {
     },
     transforms: [
       (tree) => {
-        // Find the abbrDefinitions - they'll be at the top level
+        /**
+         * Find the abbrDefinitions - they'll be at the top level
+         * @type {any[]}
+         */
         const abbrDefinitions = tree.children.filter(
           (x) => x.type === abbrTypes.abbrDefinition,
         )
@@ -174,7 +176,13 @@ export function abbrFromMarkdown() {
             return SKIP
           }
 
+          if (index === undefined || parent === undefined) {
+            return CONTINUE
+          }
+
+          // @ts-ignore parent.type is overly restrictive
           if (node.type === 'text' && parent.type !== 'abbr') {
+            /** @type {any[]} */
             const newNodes = splitTextByAbbr(node, abbrDefinitions)
             parent.children.splice(index, 1, ...newNodes)
             return SKIP
@@ -208,6 +216,7 @@ export function abbrFromMarkdown() {
    */
   function exitAbbrDefinitionLabel() {
     const label = this.resume()
+    /** @type {any} */
     const node = this.stack[this.stack.length - 1]
     assert(node.type === abbrTypes.abbrDefinition)
     node.label = label
@@ -226,6 +235,7 @@ export function abbrFromMarkdown() {
    * @type {FromMarkdownHandle}
    */
   function exitAbbrDefinitionValueString() {
+    /** @type {any} */
     const node = this.stack.find(
       (node) => node.type === abbrTypes.abbrDefinition,
     )

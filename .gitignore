@@ -1,5 +1,9 @@
+*.d.ts
+*.log
 /node_modules
 /.vscode
 /coverage
 /lib
 /index.js
+!/dev/index.d.ts
+/tsconfig.tsbuildinfo

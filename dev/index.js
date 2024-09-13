@@ -7,9 +7,7 @@ export {
 } from './lib/micromark-extension-abbr/syntax.js'
 export {abbrFromMarkdown as mdastUtilAbbrFromMarkdown} from './lib/mdast-util-abbr/index.js'
 
-/**
- * @this {any}
- */
+/** @this {any} */
 export default function remarkAbbr() {
   const self = this
   const data = self.data()
