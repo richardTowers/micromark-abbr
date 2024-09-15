@@ -27,7 +27,7 @@ import {abbrTypes} from '../micromark-extension-abbr/syntax.js'
 /**
  *
  * @param {Text} textNode
- * @param {{label: string, title: string}[]} abbreviations
+ * @param {AbbrDefinition[]} abbreviations
  * @returns {(Text|Abbr)[]}
  */
 function splitTextByAbbr(textNode, abbreviations) {
