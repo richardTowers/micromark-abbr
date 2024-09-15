@@ -1,6 +1,6 @@
 {
   "name": "@richardtowers/remark-abbr",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc --build --clean && tsc --build && type-coverage && micromark-build",
