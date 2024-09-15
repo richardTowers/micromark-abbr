@@ -1,7 +1,12 @@
 {
   "name": "@richardtowers/remark-abbr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
+  "files": [
+    "lib/",
+    "index.js",
+    "index.d.ts"
+  ],
   "scripts": {
     "build": "tsc --build --clean && tsc --build && type-coverage && micromark-build",
     "format": "prettier . -w --log-level warn && xo --fix",
