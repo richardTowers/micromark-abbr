@@ -5,6 +5,10 @@
  *   Handle as FromMarkdownHandle
  * } from 'mdast-util-from-markdown'
  * @import {
+ *   Options as ToMarkdownExtension,
+ *   Handle as ToMarkdownHandle
+ * } from 'mdast-util-to-markdown'
+ * @import {
  *   Point,
  * } from 'unist'
  * @import {
@@ -264,5 +268,31 @@ export function abbrFromMarkdown() {
    */
   function exitAbbrDefinition(token) {
     this.exit(token)
+  }
+}
+
+/**
+ * Create an extension for `mdast-util-to-markdown` to enable abbreviations
+ * in markdown.
+ *
+ * @returns {ToMarkdownExtension}
+ *   Extension for `mdast-util-to-markdown`.
+ */
+export function abbrToMarkdown() {
+  return {
+    handlers: {
+      abbr: handleAbbr,
+      abbrDefinition: handleAbbrDefinition,
+    },
+  }
+
+  /** @type {ToMarkdownHandle} */
+  function handleAbbr(node, _, state, info) {
+    return state.safe(node.abbr, info)
+  }
+
+  /** @type {ToMarkdownHandle} */
+  function handleAbbrDefinition(node, _, state, info) {
+    return state.safe(`*[${node.label}]: ${node.title}`, info)
   }
 }

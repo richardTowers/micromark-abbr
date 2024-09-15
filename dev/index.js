@@ -6,7 +6,10 @@ export {
   abbr as micromarkAbbr,
   abbrTypes as micromarkAbbrTypes,
 } from './lib/micromark-extension-abbr/syntax.js'
-export {abbrFromMarkdown as mdastUtilAbbrFromMarkdown} from './lib/mdast-util-abbr/index.js'
+export {
+  abbrFromMarkdown as mdastUtilAbbrFromMarkdown,
+  abbrToMarkdown as mdastUtilAbbrToMarkdown,
+} from './lib/mdast-util-abbr/index.js'
 
 /** @this {Processor} */
 export default function remarkAbbr() {

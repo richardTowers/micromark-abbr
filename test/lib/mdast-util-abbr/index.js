@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {fromMarkdown} from 'mdast-util-from-markdown'
+import {toMarkdown} from 'mdast-util-to-markdown'
 import {
   micromarkAbbr as abbr,
   mdastUtilAbbrFromMarkdown as abbrFromMarkdown,
+  mdastUtilAbbrToMarkdown as abbrToMarkdown,
 } from '@richardtowers/remark-abbr'
 import {removePosition} from 'unist-util-remove-position'
 
@@ -308,4 +310,19 @@ test('abbrFromMarkdown', async function (t) {
       assert.deepEqual(actual, expected)
     },
   )
+
+  await t.test('should support rendering back to markdown', async function () {
+    const originalMarkdown =
+      'I like to use HTML because it is cool\n\n*[HTML]: Hootin Tootin Magic Lingo\n\n*[HTML]: Hyper Text Markup Language\n'
+
+    const ast = fromMarkdown(originalMarkdown, {
+      extensions: [abbr],
+      mdastExtensions: [abbrFromMarkdown()],
+    })
+    const result = toMarkdown(ast, {
+      extensions: [abbrToMarkdown()],
+    })
+
+    assert.equal(result, originalMarkdown)
+  })
 })

@@ -121,9 +121,9 @@ console.log(String(file))
 
 ## API
 
-This package exports `micromarkAbbr`, `micromarkAbbrTypes`, and
-`mdastUtilAbbrFromMarkdown`, which are used internally. Use them directly at
-your own risk.
+This package exports `micromarkAbbr`, `micromarkAbbrTypes`,
+`mdastUtilAbbrFromMarkdown`, and `mdastUtilAbbrToMarkdown`, which are used
+internally. Use them directly at your own risk.
 
 The default export is `remarkAbbr`.
 
