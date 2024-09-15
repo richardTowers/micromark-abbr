@@ -5,8 +5,15 @@
  *   Handle as FromMarkdownHandle
  * } from 'mdast-util-from-markdown'
  * @import {
- *   Node,
+ *   Point,
  * } from 'unist'
+ * @import {
+ *   Text,
+ * } from 'mdast'
+ * @import {
+ *   Abbr,
+ *   AbbrDefinition,
+ * } from './types/index.js'
  */
 
 import {SKIP, CONTINUE, visit} from 'unist-util-visit'
@@ -15,9 +22,9 @@ import {abbrTypes} from '../micromark-extension-abbr/syntax.js'
 
 /**
  *
- * @param {any} textNode
+ * @param {Text} textNode
  * @param {{label: string, title: string}[]} abbreviations
- * @returns {Node[]}
+ * @returns {(Text|Abbr)[]}
  */
 function splitTextByAbbr(textNode, abbreviations) {
   // Technically, there can be multiple abbreviation definitions
@@ -64,45 +71,32 @@ function splitTextByAbbr(textNode, abbreviations) {
   for (const match of matches) {
     if (match.start > currentIndex) {
       nodes.push({
-        type: 'text',
+        ...textNode,
         value: textNode.value.slice(currentIndex, match.start),
-        position: {
-          start: {
-            line: textNode.position.start.line,
-            column: textNode.position.start.column + currentIndex,
-            offset: textNode.position.start.offset + currentIndex,
-          },
-          end: {
-            line: textNode.position.start.line,
-            column: textNode.position.start.column + match.start,
-            offset: textNode.position.start.offset + match.start,
-          },
+        position: textNode.position && {
+          start: updatePoint(textNode.position.start, currentIndex),
+          end: updatePoint(textNode.position.start, match.start),
         },
       })
     }
 
-    const abbrPosition = {
-      start: {
-        line: textNode.position.start.line,
-        column: textNode.position.start.column + match.start,
-        offset: textNode.position.start.offset + match.start,
-      },
-      end: {
-        line: textNode.position.end.line,
-        column: textNode.position.start.column + match.end + 1,
-        offset: textNode.position.start.offset + match.end + 1,
-      },
+    const abbrPosition = textNode.position && {
+      start: updatePoint(textNode.position.start, match.start),
+      end: updatePoint(textNode.position.start, match.end + 1),
     }
-
     nodes.push({
-      type: 'abbr',
+      type: /** @type {'abbr'} */ ('abbr'),
       abbr: match.abbr.label,
       reference: match.abbr.title,
       children: [
-        {type: 'text', value: match.abbr.label, position: abbrPosition},
+        {
+          type: /** @type {'text'} */ ('text'),
+          value: match.abbr.label,
+          position: abbrPosition,
+        },
       ],
       data: {
-        hName: 'abbr',
+        hName: /** @type {'abbr'} */ ('abbr'),
         hProperties: {
           title: match.abbr.title,
         },
@@ -118,24 +112,33 @@ function splitTextByAbbr(textNode, abbreviations) {
   // add one final text node with the remainder of the value
   if (currentIndex < textNode.value.length) {
     nodes.push({
-      type: 'text',
+      ...textNode,
       value: textNode.value.slice(currentIndex),
-      position: {
-        start: {
-          line: textNode.position.start.line,
-          column: textNode.position.start.column + currentIndex,
-          offset: textNode.position.start.offset + currentIndex,
-        },
-        end: {
-          line: textNode.position.start.line,
-          column: textNode.position.end.column,
-          offset: textNode.position.end.offset,
-        },
+      position: textNode.position && {
+        start: updatePoint(textNode.position.start, currentIndex),
+        end: updatePoint(textNode.position.end, 0),
       },
     })
   }
 
   return nodes
+
+  /**
+   *
+   * @param {Point} point
+   * @param {number} increment
+   * @returns {Point}
+   */
+  function updatePoint(point, increment) {
+    return {
+      line: point.line,
+      column: point.column + increment,
+      offset:
+        point.offset === undefined
+          ? /* c8 ignore next */ undefined
+          : point.offset + increment,
+    }
+  }
 }
 
 /**
@@ -161,8 +164,9 @@ export function abbrFromMarkdown() {
       (tree) => {
         /**
          * Find the abbrDefinitions - they'll be at the top level
-         * @type {any[]}
+         * @type {AbbrDefinition[]}
          */
+        // @ts-ignore - typescript doesn't believe that RootContent nodes can be AbbrDefinitions
         const abbrDefinitions = tree.children.filter(
           (x) => x.type === abbrTypes.abbrDefinition,
         )
@@ -180,10 +184,11 @@ export function abbrFromMarkdown() {
             return CONTINUE
           }
 
-          // @ts-ignore parent.type is overly restrictive
           if (node.type === 'text' && parent.type !== 'abbr') {
-            /** @type {any[]} */
-            const newNodes = splitTextByAbbr(node, abbrDefinitions)
+            const newNodes = splitTextByAbbr(
+              /** @type {Text} */ (node),
+              abbrDefinitions,
+            )
             parent.children.splice(index, 1, ...newNodes)
             return SKIP
           }
@@ -201,8 +206,8 @@ export function abbrFromMarkdown() {
   function enterAbbrDefinition(token) {
     this.enter(
       {
-        // @ts-ignore
         type: abbrTypes.abbrDefinition,
+        title: '',
         label: '',
         children: [],
       },
@@ -224,7 +229,6 @@ export function abbrFromMarkdown() {
    */
   function exitAbbrDefinitionLabel() {
     const label = this.resume()
-    /** @type {any} */
     const node = this.stack[this.stack.length - 1]
     assert(node.type === abbrTypes.abbrDefinition)
     node.label = label
@@ -243,12 +247,15 @@ export function abbrFromMarkdown() {
    * @type {FromMarkdownHandle}
    */
   function exitAbbrDefinitionValueString() {
-    /** @type {any} */
+    /** @type {AbbrDefinition|undefined} */
+    // @ts-ignore
     const node = this.stack.find(
       (node) => node.type === abbrTypes.abbrDefinition,
     )
     assert(node, 'expected to find an abbrDefinition node in the stack')
-    node.title = this.resume()
+    if (node !== undefined) {
+      node.title = this.resume()
+    }
   }
 
   /**

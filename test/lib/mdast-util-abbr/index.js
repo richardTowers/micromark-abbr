@@ -5,6 +5,7 @@ import {
   micromarkAbbr as abbr,
   mdastUtilAbbrFromMarkdown as abbrFromMarkdown,
 } from '@richardtowers/remark-abbr'
+import {removePosition} from 'unist-util-remove-position'
 
 test('abbrFromMarkdown', async function (t) {
   await t.test('should support an abbreviation definition', async function () {
@@ -147,6 +148,73 @@ test('abbrFromMarkdown', async function (t) {
     }
     assert.deepEqual(actual, expected)
   })
+
+  await t.test(
+    'should support abbreviation calls without positional information',
+    async function () {
+      const actual = fromMarkdown(
+        'I like to use HTML because it is cool\n\n*[HTML]: Hyper Text Markup Language',
+        {
+          extensions: [abbr],
+          mdastExtensions: [
+            {
+              transforms: [(tree) => removePosition(tree)],
+            },
+            abbrFromMarkdown(),
+          ],
+        },
+      )
+      const expected = {
+        type: 'root',
+        children: [
+          {
+            type: 'paragraph',
+            children: [
+              {
+                type: 'text',
+                value: 'I like to use ',
+                position: undefined,
+              },
+              {
+                type: 'abbr',
+                abbr: 'HTML',
+                reference: 'Hyper Text Markup Language',
+                children: [
+                  {
+                    type: 'text',
+                    value: 'HTML',
+                    position: undefined,
+                  },
+                ],
+                data: {
+                  hName: 'abbr',
+                  hProperties: {
+                    title: 'Hyper Text Markup Language',
+                  },
+                },
+                position: undefined,
+              },
+              {
+                type: 'text',
+                value: ' because it is cool',
+                position: undefined,
+              },
+            ],
+            position: undefined,
+          },
+          {
+            type: 'abbrDefinition',
+            label: 'HTML',
+            title: 'Hyper Text Markup Language',
+            children: [],
+            position: undefined,
+          },
+        ],
+        position: undefined,
+      }
+      assert.deepEqual(actual, expected)
+    },
+  )
 
   await t.test(
     'should support abbreviation calls with duplicate labels - last label wins',
