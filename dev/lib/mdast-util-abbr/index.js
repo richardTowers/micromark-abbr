@@ -199,7 +199,15 @@ export function abbrFromMarkdown() {
    * @type {FromMarkdownHandle}
    */
   function enterAbbrDefinition(token) {
-    this.enter({type: abbrTypes.abbrDefinition, label: '', children: []}, token)
+    this.enter(
+      {
+        // @ts-ignore
+        type: abbrTypes.abbrDefinition,
+        label: '',
+        children: [],
+      },
+      token,
+    )
   }
 
   /**

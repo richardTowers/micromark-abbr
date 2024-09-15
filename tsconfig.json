@@ -10,6 +10,6 @@
     "strict": true,
     "target": "es2022"
   },
-  "exclude": ["coverage/", "lib/", "node_modules/"],
-  "include": ["**/*.js", "dev/index.d.ts"]
+  "exclude": ["coverage/", "coverage-ts/", "lib/", "node_modules/"],
+  "include": ["**/*.js", "**/types/index.d.ts"]
 }

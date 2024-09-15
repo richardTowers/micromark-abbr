@@ -3,7 +3,8 @@
  *   ConstructRecord,
  *   Extension,
  *   State,
- *   Tokenizer
+ *   Tokenizer,
+ *   TokenTypeMap
  * } from 'micromark-util-types'
  */
 import {codes, types} from 'micromark-util-symbol'
@@ -16,7 +17,13 @@ import {
 } from 'micromark-util-character'
 
 /**
- * @type {Record<any, any>}
+ * @type {{
+ * abbrDefinition: 'abbrDefinition',
+ * abbrDefinitionLabel: 'abbrDefinitionLabel',
+ * abbrDefinitionMarker: 'abbrDefinitionMarker',
+ * abbrDefinitionString: 'abbrDefinitionString',
+ * abbrDefinitionValueString: 'abbrDefinitionValueString',
+ * }}
  */
 export const abbrTypes = {
   abbrDefinition: 'abbrDefinition',
@@ -60,6 +67,7 @@ function abbrDefinitionTokenize(effects, ok, nok) {
         effects,
         abbrKeyValueSeparator,
         nok,
+        // @ts-ignore
         abbrTypes.abbrDefinitionLabel,
         abbrTypes.abbrDefinitionMarker,
         abbrTypes.abbrDefinitionString,

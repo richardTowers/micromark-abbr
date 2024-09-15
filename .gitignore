@@ -1,9 +1,10 @@
 *.d.ts
+!**/types/index.d.ts
 *.log
 /node_modules
 /.vscode
 /coverage
+/coverage-ts
 /lib
 /index.js
-!/dev/index.d.ts
 /tsconfig.tsbuildinfo
