@@ -101,7 +101,7 @@ import {unified} from 'unified'
 
 const file = await unified()
   .use(remarkParse)
-  .use(remarkGfm)
+  .use(remarkAbbr)
   .use(remarkRehype, {
     handlers: {
       abbrDefinition: () => undefined,
