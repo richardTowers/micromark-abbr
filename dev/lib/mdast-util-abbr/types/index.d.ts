@@ -1,28 +1,37 @@
-import type {Position} from 'unist'
-import type {Parent, Text} from 'mdast'
+import type {Data, Literal} from 'mdast'
 
-interface AbbrDefinition extends Parent {
-  label: string
-  title: string
+export interface AbbrDefinitionData extends Data {}
+
+export interface AbbrDefinition extends Literal {
+  type: 'abbrDefinition'
+  identifier: string
+  data?: AbbrDefinitionData | undefined
 }
 
-interface Abbr extends Parent {
-  type: 'abbr'
-  abbr: string
-  reference: string
-  children: Text[]
-  data: {
-    hName: 'abbr'
-    hProperties: {
-      title: string
-    }
+export interface AbbrData extends Data {
+  hName?: 'abbr' | undefined
+  hProperties?: {
+    title?: string | undefined
   }
-  position: Position | undefined
+}
+
+export interface Abbr extends Literal {
+  type: 'abbr'
+  identifier: string
+  data?: AbbrData | undefined
 }
 
 declare module 'mdast' {
-  interface RootContentMap {
-    abbr: Abbr
+  interface DefinitionContentMap {
     abbrDefinition: AbbrDefinition
+  }
+
+  interface PhrasingContentMap {
+    abbr: Abbr
+  }
+
+  interface RootContentMap {
+    abbrDefinition: AbbrDefinition
+    abbr: Abbr
   }
 }

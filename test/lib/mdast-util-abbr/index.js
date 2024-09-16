@@ -20,9 +20,8 @@ test('abbrFromMarkdown', async function (t) {
       children: [
         {
           type: 'abbrDefinition',
-          label: 'HTML',
-          title: 'Hyper Text Markup Language',
-          children: [],
+          identifier: 'HTML',
+          value: 'Hyper Text Markup Language',
           position: {
             start: {line: 1, column: 1, offset: 0},
             end: {line: 1, column: 36, offset: 35},
@@ -52,10 +51,9 @@ test('abbrFromMarkdown', async function (t) {
         children: [
           {
             type: 'abbrDefinition',
-            label: 'MV(VSL) (E&W)',
-            title:
+            identifier: 'MV(VSL) (E&W)',
+            value:
               'Motor Vehicles (Variation of Speed Limits) (England & Wales) Regulations',
-            children: [],
             position: {
               start: {line: 1, column: 1, offset: 0},
               end: {line: 1, column: 91, offset: 90},
@@ -95,23 +93,14 @@ test('abbrFromMarkdown', async function (t) {
             },
             {
               type: 'abbr',
-              abbr: 'HTML',
-              reference: 'Hyper Text Markup Language',
-              children: [
-                {
-                  type: 'text',
-                  value: 'HTML',
-                  position: {
-                    start: {line: 1, column: 15, offset: 14},
-                    end: {line: 1, column: 19, offset: 18},
-                  },
-                },
-              ],
+              identifier: 'HTML',
+              value: 'Hyper Text Markup Language',
               data: {
                 hName: 'abbr',
                 hProperties: {
                   title: 'Hyper Text Markup Language',
                 },
+                hChildren: [{type: 'text', value: 'HTML'}],
               },
               position: {
                 start: {line: 1, column: 15, offset: 14},
@@ -134,9 +123,8 @@ test('abbrFromMarkdown', async function (t) {
         },
         {
           type: 'abbrDefinition',
-          label: 'HTML',
-          title: 'Hyper Text Markup Language',
-          children: [],
+          identifier: 'HTML',
+          value: 'Hyper Text Markup Language',
           position: {
             start: {line: 3, column: 1, offset: 39},
             end: {line: 3, column: 36, offset: 74},
@@ -179,20 +167,14 @@ test('abbrFromMarkdown', async function (t) {
               },
               {
                 type: 'abbr',
-                abbr: 'HTML',
-                reference: 'Hyper Text Markup Language',
-                children: [
-                  {
-                    type: 'text',
-                    value: 'HTML',
-                    position: undefined,
-                  },
-                ],
+                identifier: 'HTML',
+                value: 'Hyper Text Markup Language',
                 data: {
                   hName: 'abbr',
                   hProperties: {
                     title: 'Hyper Text Markup Language',
                   },
+                  hChildren: [{type: 'text', value: 'HTML'}],
                 },
                 position: undefined,
               },
@@ -206,9 +188,8 @@ test('abbrFromMarkdown', async function (t) {
           },
           {
             type: 'abbrDefinition',
-            label: 'HTML',
-            title: 'Hyper Text Markup Language',
-            children: [],
+            identifier: 'HTML',
+            value: 'Hyper Text Markup Language',
             position: undefined,
           },
         ],
@@ -244,23 +225,14 @@ test('abbrFromMarkdown', async function (t) {
               },
               {
                 type: 'abbr',
-                abbr: 'HTML',
-                reference: 'Hyper Text Markup Language',
-                children: [
-                  {
-                    type: 'text',
-                    value: 'HTML',
-                    position: {
-                      start: {line: 1, column: 15, offset: 14},
-                      end: {line: 1, column: 19, offset: 18},
-                    },
-                  },
-                ],
+                identifier: 'HTML',
+                value: 'Hyper Text Markup Language',
                 data: {
                   hName: 'abbr',
                   hProperties: {
                     title: 'Hyper Text Markup Language',
                   },
+                  hChildren: [{type: 'text', value: 'HTML'}],
                 },
                 position: {
                   start: {line: 1, column: 15, offset: 14},
@@ -283,9 +255,8 @@ test('abbrFromMarkdown', async function (t) {
           },
           {
             type: 'abbrDefinition',
-            label: 'HTML',
-            title: 'Hootin Tootin Magic Lingo',
-            children: [],
+            identifier: 'HTML',
+            value: 'Hootin Tootin Magic Lingo',
             position: {
               start: {line: 3, column: 1, offset: 39},
               end: {line: 3, column: 35, offset: 73},
@@ -293,9 +264,8 @@ test('abbrFromMarkdown', async function (t) {
           },
           {
             type: 'abbrDefinition',
-            label: 'HTML',
-            title: 'Hyper Text Markup Language',
-            children: [],
+            identifier: 'HTML',
+            value: 'Hyper Text Markup Language',
             position: {
               start: {line: 5, column: 1, offset: 75},
               end: {line: 5, column: 36, offset: 110},

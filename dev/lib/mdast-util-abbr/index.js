@@ -27,27 +27,33 @@ import {abbrTypes} from '../micromark-extension-abbr/syntax.js'
 /**
  *
  * @param {Text} textNode
- * @param {AbbrDefinition[]} abbreviations
+ * @param {AbbrDefinition[]} abbrDefinitions
  * @returns {(Text|Abbr)[]}
  */
-function splitTextByAbbr(textNode, abbreviations) {
-  // Technically, there can be multiple abbreviation definitions
-  // with the same label. In this case, the last one should win.
-  // We can achieve this by creating a map with the label as the key
-  // and then getting the values
+function splitTextByAbbr(textNode, abbrDefinitions) {
+  /**
+   * Technically, there can be multiple abbreviation definitions
+   * with the same label. In this case, the last one should win.
+   * We can achieve this by creating a map with the label as the key
+   * and then getting the values
+   * @type {Map<string, AbbrDefinition>}
+   */
   const uniqueAbbreviationMap = new Map()
-  for (const abbreviation of abbreviations) {
-    uniqueAbbreviationMap.set(abbreviation.label, abbreviation)
+  for (const abbreviation of abbrDefinitions) {
+    uniqueAbbreviationMap.set(abbreviation.identifier, abbreviation)
   }
 
   const uniqueAbbreviations = [...uniqueAbbreviationMap.values()]
 
   const matches = uniqueAbbreviations
-    .map((abbr) => [abbr, textNode.value.indexOf(abbr.label)])
+    .map(
+      (abbr) =>
+        /** @type {const} */ ([abbr, textNode.value.indexOf(abbr.identifier)]),
+    )
     .filter(([_abbr, index]) => index >= 0)
     .map(([abbr, index]) => {
       const start = index
-      const end = index + abbr.label.length - 1
+      const end = index + abbr.identifier.length - 1
       return {
         abbr,
         start,
@@ -88,25 +94,21 @@ function splitTextByAbbr(textNode, abbreviations) {
       start: updatePoint(textNode.position.start, match.start),
       end: updatePoint(textNode.position.start, match.end + 1),
     }
-    nodes.push({
-      type: /** @type {'abbr'} */ ('abbr'),
-      abbr: match.abbr.label,
-      reference: match.abbr.title,
-      children: [
-        {
-          type: /** @type {'text'} */ ('text'),
-          value: match.abbr.label,
-          position: abbrPosition,
-        },
-      ],
+    /** @type {Abbr} */
+    const abbr = {
+      type: 'abbr',
+      value: match.abbr.value,
+      identifier: match.abbr.identifier,
       data: {
-        hName: /** @type {'abbr'} */ ('abbr'),
+        hName: 'abbr',
         hProperties: {
-          title: match.abbr.title,
+          title: match.abbr.value,
         },
+        hChildren: [{type: 'text', value: match.abbr.identifier}],
       },
       position: abbrPosition,
-    })
+    }
+    nodes.push(abbr)
 
     // Move the position forwards
     currentIndex = match.end + 1
@@ -179,20 +181,12 @@ export function abbrFromMarkdown() {
         }
 
         visit(tree, null, (node, index, parent) => {
-          // Don't recurse into abbrDefinitions
-          if (node.type === abbrTypes.abbrDefinition) {
-            return SKIP
-          }
-
           if (index === undefined || parent === undefined) {
             return CONTINUE
           }
 
-          if (node.type === 'text' && parent.type !== 'abbr') {
-            const newNodes = splitTextByAbbr(
-              /** @type {Text} */ (node),
-              abbrDefinitions,
-            )
+          if (node.type === 'text') {
+            const newNodes = splitTextByAbbr(node, abbrDefinitions)
             parent.children.splice(index, 1, ...newNodes)
             return SKIP
           }
@@ -211,9 +205,8 @@ export function abbrFromMarkdown() {
     this.enter(
       {
         type: abbrTypes.abbrDefinition,
-        title: '',
-        label: '',
-        children: [],
+        value: '',
+        identifier: '',
       },
       token,
     )
@@ -235,7 +228,7 @@ export function abbrFromMarkdown() {
     const label = this.resume()
     const node = this.stack[this.stack.length - 1]
     assert(node.type === abbrTypes.abbrDefinition)
-    node.label = label
+    node.identifier = label
   }
 
   /**
@@ -258,7 +251,7 @@ export function abbrFromMarkdown() {
     )
     assert(node, 'expected to find an abbrDefinition node in the stack')
     if (node !== undefined) {
-      node.title = this.resume()
+      node.value = this.resume()
     }
   }
 
@@ -286,13 +279,19 @@ export function abbrToMarkdown() {
     },
   }
 
-  /** @type {ToMarkdownHandle} */
+  /**
+   * @type {ToMarkdownHandle}
+   * @param {Abbr} node
+   */
   function handleAbbr(node, _, state, info) {
-    return state.safe(node.abbr, info)
+    return state.safe(node.identifier, info)
   }
 
-  /** @type {ToMarkdownHandle} */
+  /**
+   * @type {ToMarkdownHandle}
+   * @param {AbbrDefinition} node
+   */
   function handleAbbrDefinition(node, _, state, info) {
-    return state.safe(`*[${node.label}]: ${node.title}`, info)
+    return state.safe(`*[${node.identifier}]: ${node.value}`, info)
   }
 }
