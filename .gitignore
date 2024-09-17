@@ -1,5 +1,6 @@
 *.d.ts
 !**/types/index.d.ts
+!/dev/type-references.d.ts
 *.log
 /node_modules
 /.vscode

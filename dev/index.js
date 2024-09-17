@@ -1,6 +1,3 @@
-/// <reference types="./lib/mdast-util-abbr/types/index.js" />
-/// <reference types="./lib/micromark-extension-abbr/types/index.js" />
-
 /** @import { Processor } from "unified" */
 import {abbr} from './lib/micromark-extension-abbr/syntax.js'
 import {abbrFromMarkdown} from './lib/mdast-util-abbr/index.js'

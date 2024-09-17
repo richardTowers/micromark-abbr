@@ -13,7 +13,8 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build": "tsc --build --clean && tsc --build && type-coverage && micromark-build",
+    "build": "tsc --build --clean && tsc --build && type-coverage && micromark-build && npm run munge-type-references",
+    "munge-type-references": "cat type-references.d.ts index.d.ts > tmp.d.ts && mv tmp.d.ts index.d.ts && rm type-references.d.ts",
     "format": "prettier . -w --log-level warn && xo --fix",
     "test-dev": "node --conditions development --test",
     "test-prod": "node --conditions production --test",
